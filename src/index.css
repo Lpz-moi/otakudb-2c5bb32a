@@ -88,12 +88,14 @@
   }
 
   .anime-card {
-    @apply relative overflow-hidden rounded-xl bg-card border border-border/30 transition-all duration-300;
+    @apply relative overflow-hidden rounded-2xl bg-card border border-border/20 transition-all duration-300;
+    box-shadow: 0 2px 8px -2px hsla(0 0% 0% / 0.3);
   }
 
   .anime-card:hover {
-    @apply border-primary/30 scale-[1.02];
-    box-shadow: var(--shadow-glow);
+    @apply border-primary/40;
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-glow), 0 12px 24px -8px hsla(0 0% 0% / 0.4);
   }
 
   .anime-card-image {
@@ -101,11 +103,11 @@
   }
 
   .glow-text {
-    text-shadow: 0 0 20px hsla(24, 85%, 55%, 0.5);
+    text-shadow: 0 0 30px hsla(24, 85%, 55%, 0.6);
   }
 
   .nav-link {
-    @apply flex items-center gap-3 px-4 py-3 rounded-lg text-muted-foreground transition-all duration-200;
+    @apply flex items-center gap-3 px-4 py-3 rounded-xl text-muted-foreground transition-all duration-200;
   }
 
   .nav-link:hover {
@@ -113,79 +115,86 @@
   }
 
   .nav-link.active {
-    @apply bg-primary/10 text-primary;
+    @apply bg-primary/15 text-primary font-medium;
   }
 
+  /* Score badge - larger and more visible */
   .score-badge {
-    @apply inline-flex items-center gap-1 px-2 py-1 rounded-md text-sm font-semibold;
+    @apply inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-sm font-bold backdrop-blur-sm;
   }
 
   .score-badge.high {
-    @apply bg-[hsl(var(--rating-green))]/20 text-[hsl(var(--rating-green))];
+    @apply bg-[hsl(var(--rating-green))]/25 text-[hsl(var(--rating-green))];
+    box-shadow: 0 0 12px -2px hsl(var(--rating-green) / 0.4);
   }
 
   .score-badge.medium {
-    @apply bg-[hsl(var(--rating-gold))]/20 text-[hsl(var(--rating-gold))];
+    @apply bg-[hsl(var(--rating-gold))]/25 text-[hsl(var(--rating-gold))];
+    box-shadow: 0 0 12px -2px hsl(var(--rating-gold) / 0.4);
   }
 
   .score-badge.low {
-    @apply bg-[hsl(var(--rating-red))]/20 text-[hsl(var(--rating-red))];
+    @apply bg-[hsl(var(--rating-red))]/25 text-[hsl(var(--rating-red))];
+    box-shadow: 0 0 12px -2px hsl(var(--rating-red) / 0.4);
   }
 
+  /* Status badge - cleaner design */
   .status-badge {
-    @apply inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium;
+    @apply inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold backdrop-blur-sm;
   }
 
   .status-watching {
-    @apply bg-[hsl(var(--status-watching))]/20 text-[hsl(var(--status-watching))];
+    @apply bg-[hsl(var(--status-watching))]/25 text-[hsl(var(--status-watching))];
   }
 
   .status-completed {
-    @apply bg-[hsl(var(--status-completed))]/20 text-[hsl(var(--status-completed))];
+    @apply bg-[hsl(var(--status-completed))]/25 text-[hsl(var(--status-completed))];
   }
 
   .status-planned {
-    @apply bg-[hsl(var(--status-planned))]/20 text-[hsl(var(--status-planned))];
+    @apply bg-[hsl(var(--status-planned))]/25 text-[hsl(var(--status-planned))];
   }
 
   .status-favorites {
-    @apply bg-[hsl(var(--status-favorites))]/20 text-[hsl(var(--status-favorites))];
+    @apply bg-[hsl(var(--status-favorites))]/25 text-[hsl(var(--status-favorites))];
   }
 
+  /* Buttons - refined */
   .btn-primary {
-    @apply bg-primary text-primary-foreground hover:bg-primary/90 px-4 py-2 rounded-lg font-medium transition-all duration-200;
+    @apply bg-primary text-primary-foreground hover:bg-primary/90 px-5 py-2.5 rounded-xl font-semibold transition-all duration-200;
   }
 
   .btn-primary:hover {
+    transform: translateY(-1px);
     box-shadow: var(--shadow-glow);
   }
 
   .btn-secondary {
-    @apply bg-secondary text-secondary-foreground hover:bg-secondary/80 px-4 py-2 rounded-lg font-medium transition-all duration-200;
+    @apply bg-secondary text-secondary-foreground hover:bg-secondary/80 px-5 py-2.5 rounded-xl font-medium transition-all duration-200;
   }
 
   .btn-ghost {
-    @apply text-muted-foreground hover:text-foreground hover:bg-accent px-4 py-2 rounded-lg font-medium transition-all duration-200;
+    @apply text-muted-foreground hover:text-foreground hover:bg-accent px-5 py-2.5 rounded-xl font-medium transition-all duration-200;
   }
 
   .input-search {
-    @apply w-full bg-secondary border-none rounded-xl px-4 py-3 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all duration-200;
+    @apply w-full bg-secondary/80 border border-border/30 rounded-2xl px-5 py-3.5 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary/40 transition-all duration-200;
   }
 
   .skeleton {
-    @apply bg-muted animate-pulse rounded-lg;
+    @apply bg-muted/60 animate-pulse rounded-xl;
   }
 
   .page-container {
-    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6;
+    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8;
   }
 
   .section-title {
-    @apply text-xl sm:text-2xl font-bold text-foreground mb-4;
+    @apply text-xl sm:text-2xl font-bold text-foreground mb-6;
   }
 
   .tab-item {
-    @apply px-4 py-2 rounded-lg text-muted-foreground font-medium transition-all duration-200 cursor-pointer;
+    @apply px-5 py-2.5 rounded-xl text-muted-foreground font-medium transition-all duration-200 cursor-pointer;
   }
 
   .tab-item:hover {
@@ -193,11 +202,11 @@
   }
 
   .tab-item.active {
-    @apply text-primary bg-primary/10;
+    @apply text-primary bg-primary/15 font-semibold;
   }
 
   .progress-bar {
-    @apply h-1.5 bg-muted rounded-full overflow-hidden;
+    @apply h-2 bg-muted/50 rounded-full overflow-hidden;
   }
 
   .progress-bar-fill {
