@@ -1,10 +1,9 @@
 import { useEffect, useState } from 'react';
-import { TrendingUp, Calendar, Sparkles } from 'lucide-react';
+import { TrendingUp, Calendar, Sparkles, Play, ChevronRight } from 'lucide-react';
 import { getTopAnime, getSeasonalAnime, type Anime } from '@/services/jikanApi';
 import { AnimeGrid } from '@/components/anime/AnimeGrid';
 import { useAnimeListStore } from '@/stores/animeListStore';
 import { Link } from 'react-router-dom';
-import { Play } from 'lucide-react';
 
 const HomePage = () => {
   const [trendingAnime, setTrendingAnime] = useState<Anime[]>([]);
@@ -40,18 +39,22 @@ const HomePage = () => {
   }, []);
 
   return (
-    <div className="page-container space-y-10">
+    <div className="page-container space-y-12">
       {/* Hero Section */}
-      <section className="relative -mx-4 sm:-mx-6 lg:-mx-8 -mt-6 px-4 sm:px-6 lg:px-8 py-12 md:py-16 bg-gradient-to-b from-primary/5 to-transparent">
-        <div className="max-w-2xl">
-          <h1 className="text-3xl sm:text-4xl md:text-5xl font-display font-bold text-foreground leading-tight">
+      <section className="relative -mx-4 sm:-mx-6 lg:-mx-8 -mt-8 px-6 sm:px-8 lg:px-12 py-14 md:py-20 bg-gradient-to-br from-primary/8 via-background to-background overflow-hidden">
+        {/* Decorative elements */}
+        <div className="absolute top-0 right-0 w-96 h-96 bg-primary/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
+        <div className="absolute bottom-0 left-0 w-64 h-64 bg-primary/5 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2" />
+        
+        <div className="relative max-w-2xl">
+          <h1 className="text-4xl sm:text-5xl md:text-6xl font-display font-bold text-foreground leading-tight">
             Bienvenue sur{' '}
             <span className="text-primary glow-text">OtakuDB</span>
           </h1>
-          <p className="mt-4 text-lg text-muted-foreground">
-            Gérez vos animes, suivez votre progression, découvrez de nouvelles pépites.
+          <p className="mt-5 text-lg text-muted-foreground leading-relaxed">
+            Gérez vos animes, suivez votre progression et découvrez de nouvelles pépites.
           </p>
-          <div className="mt-6 flex flex-wrap gap-3">
+          <div className="mt-8 flex flex-wrap gap-4">
             <Link to="/search" className="btn-primary inline-flex items-center gap-2">
               <Sparkles className="w-4 h-4" />
               Explorer
@@ -64,19 +67,22 @@ const HomePage = () => {
         </div>
       </section>
 
-      {/* Continue Watching */}
+      {/* Continue Watching - Enhanced cards */}
       {watchingList.length > 0 && (
         <section>
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="section-title flex items-center gap-2 mb-0">
-              <Play className="w-5 h-5 text-primary" />
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="section-title flex items-center gap-3 mb-0">
+              <div className="w-9 h-9 rounded-xl bg-status-watching/20 flex items-center justify-center">
+                <Play className="w-4 h-4 text-status-watching" />
+              </div>
               Continuer à regarder
             </h2>
-            <Link to="/lists" className="text-sm text-primary hover:underline">
+            <Link to="/lists" className="text-sm text-primary hover:text-primary/80 font-medium flex items-center gap-1 transition-colors">
               Voir tout
+              <ChevronRight className="w-4 h-4" />
             </Link>
           </div>
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-5">
             {watchingList.slice(0, 6).map((item, i) => (
               <Link
                 key={item.anime.mal_id}
@@ -84,16 +90,18 @@ const HomePage = () => {
                 className="anime-card group block animate-fade-in"
                 style={{ animationDelay: `${i * 50}ms` }}
               >
-                <div className="relative aspect-[3/4] overflow-hidden rounded-t-xl">
+                <div className="relative aspect-[3/4] overflow-hidden rounded-t-2xl">
                   <img
                     src={item.anime.images.webp?.large_image_url || item.anime.images.jpg?.large_image_url}
                     alt={item.anime.title}
-                    className="anime-card-image transition-transform duration-500 group-hover:scale-105"
+                    className="anime-card-image transition-transform duration-500 group-hover:scale-110"
                     loading="lazy"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent" />
-                  <div className="absolute bottom-2 left-2 right-2">
-                    <div className="progress-bar">
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent" />
+                  
+                  {/* Progress overlay */}
+                  <div className="absolute bottom-0 left-0 right-0 p-4 space-y-2">
+                    <div className="progress-bar bg-white/20">
                       <div 
                         className="progress-bar-fill" 
                         style={{ 
@@ -101,13 +109,18 @@ const HomePage = () => {
                         }} 
                       />
                     </div>
-                    <p className="text-xs text-white/80 mt-1">
-                      Ép. {item.progress}/{item.anime.episodes || '?'}
-                    </p>
+                    <div className="flex items-center justify-between">
+                      <p className="text-xs text-white font-medium">
+                        Ép. {item.progress}/{item.anime.episodes || '?'}
+                      </p>
+                      <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                        <Play className="w-4 h-4 text-primary-foreground fill-current" />
+                      </div>
+                    </div>
                   </div>
                 </div>
-                <div className="p-3">
-                  <h3 className="font-medium text-sm text-foreground line-clamp-2 group-hover:text-primary transition-colors">
+                <div className="p-4">
+                  <h3 className="font-semibold text-sm text-foreground line-clamp-2 group-hover:text-primary transition-colors">
                     {item.anime.title_english || item.anime.title}
                   </h3>
                 </div>
@@ -119,11 +132,11 @@ const HomePage = () => {
 
       {/* Error State */}
       {error && (
-        <div className="glass-card p-6 text-center">
-          <p className="text-destructive">{error}</p>
+        <div className="glass-card p-8 text-center">
+          <p className="text-destructive mb-4">{error}</p>
           <button
             onClick={() => window.location.reload()}
-            className="mt-4 btn-secondary"
+            className="btn-secondary"
           >
             Réessayer
           </button>
@@ -132,8 +145,10 @@ const HomePage = () => {
 
       {/* Trending */}
       <section>
-        <h2 className="section-title flex items-center gap-2">
-          <TrendingUp className="w-5 h-5 text-primary" />
+        <h2 className="section-title flex items-center gap-3">
+          <div className="w-9 h-9 rounded-xl bg-primary/15 flex items-center justify-center">
+            <TrendingUp className="w-4 h-4 text-primary" />
+          </div>
           Tendances
         </h2>
         <AnimeGrid animes={trendingAnime} loading={loading} />
@@ -141,8 +156,10 @@ const HomePage = () => {
 
       {/* Seasonal */}
       <section>
-        <h2 className="section-title flex items-center gap-2">
-          <Calendar className="w-5 h-5 text-primary" />
+        <h2 className="section-title flex items-center gap-3">
+          <div className="w-9 h-9 rounded-xl bg-primary/15 flex items-center justify-center">
+            <Calendar className="w-4 h-4 text-primary" />
+          </div>
           Cette saison
         </h2>
         <AnimeGrid animes={seasonalAnime} loading={loading} />
