@@ -14,16 +14,285 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      activities: {
+        Row: {
+          activity_type: string
+          anime_id: number
+          anime_image: string | null
+          anime_title: string
+          created_at: string
+          details: Json | null
+          id: string
+          user_id: string
+        }
+        Insert: {
+          activity_type: string
+          anime_id: number
+          anime_image?: string | null
+          anime_title: string
+          created_at?: string
+          details?: Json | null
+          id?: string
+          user_id: string
+        }
+        Update: {
+          activity_type?: string
+          anime_id?: number
+          anime_image?: string | null
+          anime_title?: string
+          created_at?: string
+          details?: Json | null
+          id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      anime_lists: {
+        Row: {
+          added_at: string
+          anime_id: number
+          anime_image: string | null
+          anime_title: string
+          id: string
+          notes: string | null
+          progress: number | null
+          rating: number | null
+          status: string
+          total_episodes: number | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          added_at?: string
+          anime_id: number
+          anime_image?: string | null
+          anime_title: string
+          id?: string
+          notes?: string | null
+          progress?: number | null
+          rating?: number | null
+          status: string
+          total_episodes?: number | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          added_at?: string
+          anime_id?: number
+          anime_image?: string | null
+          anime_title?: string
+          id?: string
+          notes?: string | null
+          progress?: number | null
+          rating?: number | null
+          status?: string
+          total_episodes?: number | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      friendships: {
+        Row: {
+          addressee_id: string
+          created_at: string
+          id: string
+          requester_id: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          addressee_id: string
+          created_at?: string
+          id?: string
+          requester_id: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          addressee_id?: string
+          created_at?: string
+          id?: string
+          requester_id?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          bio: string | null
+          created_at: string
+          discord_avatar: string | null
+          discord_id: string | null
+          discord_username: string | null
+          display_name: string
+          favorite_genres: string[] | null
+          id: string
+          share_completed:
+            | Database["public"]["Enums"]["share_permission"]
+            | null
+          share_favorites:
+            | Database["public"]["Enums"]["share_permission"]
+            | null
+          share_planned: Database["public"]["Enums"]["share_permission"] | null
+          share_watching: Database["public"]["Enums"]["share_permission"] | null
+          total_anime: number | null
+          total_episodes: number | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          bio?: string | null
+          created_at?: string
+          discord_avatar?: string | null
+          discord_id?: string | null
+          discord_username?: string | null
+          display_name: string
+          favorite_genres?: string[] | null
+          id?: string
+          share_completed?:
+            | Database["public"]["Enums"]["share_permission"]
+            | null
+          share_favorites?:
+            | Database["public"]["Enums"]["share_permission"]
+            | null
+          share_planned?: Database["public"]["Enums"]["share_permission"] | null
+          share_watching?:
+            | Database["public"]["Enums"]["share_permission"]
+            | null
+          total_anime?: number | null
+          total_episodes?: number | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          bio?: string | null
+          created_at?: string
+          discord_avatar?: string | null
+          discord_id?: string | null
+          discord_username?: string | null
+          display_name?: string
+          favorite_genres?: string[] | null
+          id?: string
+          share_completed?:
+            | Database["public"]["Enums"]["share_permission"]
+            | null
+          share_favorites?:
+            | Database["public"]["Enums"]["share_permission"]
+            | null
+          share_planned?: Database["public"]["Enums"]["share_permission"] | null
+          share_watching?:
+            | Database["public"]["Enums"]["share_permission"]
+            | null
+          total_anime?: number | null
+          total_episodes?: number | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      session_logs: {
+        Row: {
+          action: string
+          created_at: string
+          id: string
+          ip_address: string | null
+          metadata: Json | null
+          user_agent: string | null
+          user_id: string
+        }
+        Insert: {
+          action: string
+          created_at?: string
+          id?: string
+          ip_address?: string | null
+          metadata?: Json | null
+          user_agent?: string | null
+          user_id: string
+        }
+        Update: {
+          action?: string
+          created_at?: string
+          id?: string
+          ip_address?: string | null
+          metadata?: Json | null
+          user_agent?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      shared_lists: {
+        Row: {
+          created_at: string
+          expires_at: string | null
+          id: string
+          list_type: string
+          owner_id: string
+          share_code: string
+          view_count: number | null
+        }
+        Insert: {
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          list_type: string
+          owner_id: string
+          share_code?: string
+          view_count?: number | null
+        }
+        Update: {
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          list_type?: string
+          owner_id?: string
+          share_code?: string
+          view_count?: number | null
+        }
+        Relationships: []
+      }
+      user_roles: {
+        Row: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      are_friends: {
+        Args: { _user1: string; _user2: string }
+        Returns: boolean
+      }
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "user" | "moderator" | "admin"
+      share_permission: "none" | "friends_only" | "public"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +419,9 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["user", "moderator", "admin"],
+      share_permission: ["none", "friends_only", "public"],
+    },
   },
 } as const
