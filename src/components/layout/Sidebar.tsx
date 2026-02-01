@@ -1,7 +1,8 @@
 import { Link, useLocation } from 'react-router-dom';
-import { Home, List, Search, BarChart3, User, Tv, Compass } from 'lucide-react';
+import { Home, List, Search, BarChart3, User, Tv, Compass, Users, Share2 } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
 
-const navItems = [
+const baseNavItems = [
   { path: '/', icon: Home, label: 'Accueil' },
   { path: '/discover', icon: Compass, label: 'Découvrir' },
   { path: '/lists', icon: List, label: 'Mes Listes' },
@@ -10,8 +11,21 @@ const navItems = [
   { path: '/profile', icon: User, label: 'Profil' },
 ];
 
+const authNavItems = [
+  { path: '/', icon: Home, label: 'Accueil' },
+  { path: '/discover', icon: Compass, label: 'Découvrir' },
+  { path: '/lists', icon: List, label: 'Mes Listes' },
+  { path: '/friends', icon: Users, label: 'Amis' },
+  { path: '/share', icon: Share2, label: 'Partage' },
+  { path: '/stats', icon: BarChart3, label: 'Statistiques' },
+  { path: '/profile', icon: User, label: 'Profil' },
+];
+
 export const Sidebar = () => {
   const location = useLocation();
+  const { isAuthenticated } = useAuth();
+  
+  const navItems = isAuthenticated ? authNavItems : baseNavItems;
 
   return (
     <aside className="hidden md:flex fixed left-0 top-0 bottom-0 w-64 bg-card border-r border-border flex-col z-50">
