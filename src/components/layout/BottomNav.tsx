@@ -1,7 +1,8 @@
 import { Link, useLocation } from 'react-router-dom';
-import { Home, List, Search, Compass, User } from 'lucide-react';
+import { Home, List, Search, Compass, User, Users } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
 
-const navItems = [
+const baseNavItems = [
   { path: '/', icon: Home, label: 'Accueil' },
   { path: '/discover', icon: Compass, label: 'Découvrir' },
   { path: '/lists', icon: List, label: 'Listes' },
@@ -9,9 +10,19 @@ const navItems = [
   { path: '/profile', icon: User, label: 'Profil' },
 ];
 
+const authNavItems = [
+  { path: '/', icon: Home, label: 'Accueil' },
+  { path: '/discover', icon: Compass, label: 'Découvrir' },
+  { path: '/friends', icon: Users, label: 'Amis' },
+  { path: '/lists', icon: List, label: 'Listes' },
+  { path: '/profile', icon: User, label: 'Profil' },
+];
+
 export const BottomNav = () => {
   const location = useLocation();
-
+  const { isAuthenticated } = useAuth();
+  
+  const navItems = isAuthenticated ? authNavItems : baseNavItems;
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-50 bg-card/98 backdrop-blur-lg border-t border-border/50 md:hidden safe-area-pb">
       <div className="flex items-center justify-around h-16 px-1">
