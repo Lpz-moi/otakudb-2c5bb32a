@@ -1,5 +1,5 @@
 import { Link, useLocation } from 'react-router-dom';
-import { Home, List, Search, Compass, User, Users } from 'lucide-react';
+import { Home, List, Search, Compass, User } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 
 const baseNavItems = [
@@ -13,8 +13,8 @@ const baseNavItems = [
 const authNavItems = [
   { path: '/', icon: Home, label: 'Accueil' },
   { path: '/discover', icon: Compass, label: 'Découvrir' },
-  { path: '/friends', icon: Users, label: 'Amis' },
   { path: '/lists', icon: List, label: 'Listes' },
+  { path: '/search', icon: Search, label: 'Chercher' },
   { path: '/profile', icon: User, label: 'Profil' },
 ];
 
@@ -24,7 +24,7 @@ export const BottomNav = () => {
   
   const navItems = isAuthenticated ? authNavItems : baseNavItems;
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 bg-card/98 backdrop-blur-lg border-t border-border/50 md:hidden safe-area-pb">
+    <nav className="fixed bottom-0 left-0 right-0 z-50 bg-card/98 backdrop-blur-lg border-t border-border/30 md:hidden safe-area-pb">
       <div className="flex items-center justify-around h-16 px-1">
         {navItems.map(({ path, icon: Icon, label }) => {
           const isActive = location.pathname === path;
@@ -32,9 +32,9 @@ export const BottomNav = () => {
             <Link
               key={path}
               to={path}
-              className={`flex flex-col items-center justify-center gap-1 flex-1 h-full transition-colors ${
+              className={`flex flex-col items-center justify-center gap-0.5 flex-1 h-full transition-colors rounded-lg mx-0.5 ${
                 isActive
-                  ? 'text-primary'
+                  ? 'text-primary bg-primary/10'
                   : 'text-muted-foreground active:text-foreground'
               }`}
             >

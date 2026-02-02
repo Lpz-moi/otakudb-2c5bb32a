@@ -5,13 +5,34 @@ import type { Database } from './types';
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
 const SUPABASE_PUBLISHABLE_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
 
+// Validate environment variables in development
+if (import.meta.env.DEV) {
+  if (!SUPABASE_URL) {
+    console.warn('⚠️  VITE_SUPABASE_URL is not configured. Update your .env.local file.');
+    console.warn('   See .env.local for configuration instructions.');
+  }
+  if (!SUPABASE_PUBLISHABLE_KEY) {
+    console.warn('⚠️  VITE_SUPABASE_PUBLISHABLE_KEY is not configured. Update your .env.local file.');
+  }
+}
+
 // Import the supabase client like this:
 // import { supabase } from "@/integrations/supabase/client";
 
-export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
-  auth: {
-    storage: localStorage,
-    persistSession: true,
-    autoRefreshToken: true,
+export const supabase = createClient<Database>(
+  SUPABASE_URL || 'https://placeholder.supabase.co',
+  SUPABASE_PUBLISHABLE_KEY || 'placeholder-key',
+  {
+    auth: {
+      storage: localStorage,
+      persistSession: true,
+      autoRefreshToken: true,
+    }
   }
-});
+);
+
+// Expose supabase to window in development for easier debugging in the browser console
+if (import.meta.env.DEV && typeof window !== 'undefined') {
+  // @ts-ignore
+  window.supabase = supabase;
+}

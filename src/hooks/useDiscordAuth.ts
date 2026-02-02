@@ -22,6 +22,9 @@ export const useDiscordAuth = () => {
   const [isLoading, setIsLoading] = useState(false);
 
   const getRedirectUri = useCallback(() => {
+    // Allow overriding the OAuth redirect with an env var (useful for tunnels)
+    const override = import.meta.env.VITE_OAUTH_REDIRECT;
+    if (override && override.length > 0) return override;
     const baseUrl = window.location.origin;
     return `${baseUrl}/auth/callback`;
   }, []);
@@ -57,14 +60,16 @@ export const useDiscordAuth = () => {
     }
   }, [getRedirectUri]);
 
-  const handleCallback = useCallback(async (code: string): Promise<DiscordAuthResult | null> => {
+  const handleCallback = useCallback(async (code: string, state: string): Promise<DiscordAuthResult | null> => {
     setIsLoading(true);
     
     try {
+      // CSRF PROTECTION: Include state parameter from OAuth response
       const { data, error } = await supabase.functions.invoke('discord-auth', {
         body: {
           code,
           redirect_uri: getRedirectUri(),
+          state, // Send state back to verify CSRF token
         },
       });
 

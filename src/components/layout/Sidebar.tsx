@@ -1,24 +1,22 @@
 import { Link, useLocation } from 'react-router-dom';
-import { Home, List, Search, BarChart3, User, Tv, Compass, Users, Share2 } from 'lucide-react';
+import { Home, List, Search, BarChart3, User, Tv, Compass } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 
 const baseNavItems = [
-  { path: '/', icon: Home, label: 'Accueil' },
-  { path: '/discover', icon: Compass, label: 'Découvrir' },
-  { path: '/lists', icon: List, label: 'Mes Listes' },
-  { path: '/search', icon: Search, label: 'Recherche' },
-  { path: '/stats', icon: BarChart3, label: 'Statistiques' },
-  { path: '/profile', icon: User, label: 'Profil' },
+  { path: '/', icon: Home, label: 'Accueil', emoji: '🏠' },
+  { path: '/discover', icon: Compass, label: 'Découvrir', emoji: '🔍' },
+  { path: '/lists', icon: List, label: 'Mes listes', emoji: '📚' },
+  { path: '/search', icon: Search, label: 'Recherche', emoji: '🔎' },
+  { path: '/stats', icon: BarChart3, label: 'Stats', emoji: '📊' },
+  { path: '/profile', icon: User, label: 'Profil', emoji: '👤' },
 ];
 
 const authNavItems = [
-  { path: '/', icon: Home, label: 'Accueil' },
-  { path: '/discover', icon: Compass, label: 'Découvrir' },
-  { path: '/lists', icon: List, label: 'Mes Listes' },
-  { path: '/friends', icon: Users, label: 'Amis' },
-  { path: '/share', icon: Share2, label: 'Partage' },
-  { path: '/stats', icon: BarChart3, label: 'Statistiques' },
-  { path: '/profile', icon: User, label: 'Profil' },
+  { path: '/', icon: Home, label: 'Accueil', emoji: '🏠' },
+  { path: '/discover', icon: Compass, label: 'Découvrir', emoji: '🔍' },
+  { path: '/lists', icon: List, label: 'Mes listes', emoji: '📚' },
+  { path: '/stats', icon: BarChart3, label: 'Stats', emoji: '📊' },
+  { path: '/profile', icon: User, label: 'Profil', emoji: '👤' },
 ];
 
 export const Sidebar = () => {
@@ -28,7 +26,7 @@ export const Sidebar = () => {
   const navItems = isAuthenticated ? authNavItems : baseNavItems;
 
   return (
-    <aside className="hidden md:flex fixed left-0 top-0 bottom-0 w-64 bg-card border-r border-border flex-col z-50">
+    <aside className="hidden md:flex md:w-64 md:flex-shrink-0 bg-card border-r border-border flex-col sticky top-0 max-h-screen overflow-y-auto">
       {/* Logo */}
       <div className="p-6 border-b border-border">
         <Link to="/" className="flex items-center gap-3">
@@ -42,16 +40,20 @@ export const Sidebar = () => {
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 p-4 space-y-1">
+      <nav className="flex-1 p-4 space-y-2">
         {navItems.map(({ path, icon: Icon, label }) => {
           const isActive = location.pathname === path;
           return (
             <Link
               key={path}
               to={path}
-              className={`nav-link ${isActive ? 'active' : ''}`}
+              className={`flex items-center gap-3 px-4 py-2.5 rounded-lg transition-colors font-medium text-sm ${
+                isActive
+                  ? 'bg-primary/10 text-primary shadow-sm'
+                  : 'text-muted-foreground hover:text-foreground hover:bg-secondary/50'
+              }`}
             >
-              <Icon className="w-5 h-5" />
+              <Icon className="w-5 h-5 flex-shrink-0" />
               <span>{label}</span>
             </Link>
           );

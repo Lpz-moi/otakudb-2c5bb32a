@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { User, Info, Download, Upload, Trash2, Edit2, Check, X, Shield, LogOut, Users, Share2, Loader2 } from 'lucide-react';
+import { User, Info, Trash2, Edit2, Check, X, Shield, LogOut, Users, Share2, Loader2 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useAnimeListStore } from '@/stores/animeListStore';
 import { useUserPreferencesStore } from '@/stores/userPreferencesStore';
@@ -85,40 +85,6 @@ const ProfilePage = () => {
   const handleSignOut = async () => {
     await signOut();
     toast.success('Déconnexion réussie');
-  };
-
-  const handleExport = () => {
-    const data = exportData();
-    const blob = new Blob([data], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `otakudb-backup-${new Date().toISOString().split('T')[0]}.json`;
-    a.click();
-    URL.revokeObjectURL(url);
-    toast.success('Données exportées');
-  };
-
-  const handleImport = () => {
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.accept = '.json';
-    input.onchange = (e) => {
-      const file = (e.target as HTMLInputElement).files?.[0];
-      if (!file) return;
-      
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        const content = event.target?.result as string;
-        if (importData(content)) {
-          toast.success('Données importées');
-        } else {
-          toast.error('Erreur lors de l\'import');
-        }
-      };
-      reader.readAsText(file);
-    };
-    input.click();
   };
 
   const handleDeleteProfile = () => {
@@ -309,12 +275,12 @@ const ProfilePage = () => {
             onClick={() => navigate('/friends')}
             className="w-full glass-card p-3.5 flex items-center gap-3 hover:bg-card-hover transition-colors active:scale-[0.99]"
           >
-            <div className="w-9 h-9 rounded-xl bg-[#5865F2]/10 flex items-center justify-center">
-              <Users className="w-4 h-4 text-[#5865F2]" />
+            <div className="w-9 h-9 rounded-xl bg-violet-500/10 flex items-center justify-center">
+              <Users className="w-4 h-4 text-violet-500" />
             </div>
             <div className="flex-1 text-left">
-              <p className="font-medium text-sm text-foreground">Mes amis</p>
-              <p className="text-[11px] text-muted-foreground">Gérer vos amis Discord</p>
+              <p className="font-medium text-sm text-foreground">Découvrir</p>
+              <p className="text-[11px] text-muted-foreground">Amis et leurs listes</p>
             </div>
           </button>
 
@@ -322,12 +288,12 @@ const ProfilePage = () => {
             onClick={() => navigate('/share')}
             className="w-full glass-card p-3.5 flex items-center gap-3 hover:bg-card-hover transition-colors active:scale-[0.99]"
           >
-            <div className="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center">
-              <Share2 className="w-4 h-4 text-primary" />
+            <div className="w-9 h-9 rounded-xl bg-amber-500/10 flex items-center justify-center">
+              <Share2 className="w-4 h-4 text-amber-500" />
             </div>
             <div className="flex-1 text-left">
-              <p className="font-medium text-sm text-foreground">Partager mes listes</p>
-              <p className="text-[11px] text-muted-foreground">Créer des liens de partage</p>
+              <p className="font-medium text-sm text-foreground">Partager</p>
+              <p className="text-[11px] text-muted-foreground">Vos listes publiques</p>
             </div>
           </button>
         </div>
@@ -364,38 +330,12 @@ const ProfilePage = () => {
         </div>
       </div>
 
-      {/* Data Management */}
+      {/* Account Actions */}
       <div className="space-y-2">
         <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider px-1">
-          Données
+          Compte
         </h3>
         
-        <button 
-          onClick={handleExport}
-          className="w-full glass-card p-3.5 flex items-center gap-3 hover:bg-card-hover transition-colors active:scale-[0.99]"
-        >
-          <div className="w-9 h-9 rounded-xl bg-rating-green/10 flex items-center justify-center">
-            <Download className="w-4 h-4 text-rating-green" />
-          </div>
-          <div className="flex-1 text-left">
-            <p className="font-medium text-sm text-foreground">Exporter mes données</p>
-            <p className="text-[11px] text-muted-foreground">Sauvegarder en fichier JSON</p>
-          </div>
-        </button>
-
-        <button 
-          onClick={handleImport}
-          className="w-full glass-card p-3.5 flex items-center gap-3 hover:bg-card-hover transition-colors active:scale-[0.99]"
-        >
-          <div className="w-9 h-9 rounded-xl bg-status-watching/10 flex items-center justify-center">
-            <Upload className="w-4 h-4 text-status-watching" />
-          </div>
-          <div className="flex-1 text-left">
-            <p className="font-medium text-sm text-foreground">Importer des données</p>
-            <p className="text-[11px] text-muted-foreground">Restaurer depuis un fichier</p>
-          </div>
-        </button>
-
         {!isAuthenticated && displayProfile && (
           <button 
             onClick={handleDeleteProfile}

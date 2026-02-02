@@ -1,252 +1,234 @@
 import { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Eye, User, Star, Clock, Loader2, AlertCircle } from 'lucide-react';
+import { ArrowLeft, Loader2, AlertCircle, User, Zap } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import type { Database } from '@/integrations/supabase/types';
+import { AnimeCard } from '@/components/anime/AnimeCard';
+import { toast } from 'sonner';
 
-type SharedList = Database['public']['Tables']['shared_lists']['Row'];
 type AnimeListItem = Database['public']['Tables']['anime_lists']['Row'];
 type Profile = Database['public']['Tables']['profiles']['Row'];
+type ListStatus = 'watching' | 'completed' | 'planned' | 'favorites';
 
-interface SharedData {
-  share: SharedList;
-  owner: Profile | null;
-  items: AnimeListItem[];
-}
+const statusLabels = {
+  watching: '▶️ En cours',
+  completed: '✅ Complétés',
+  planned: '⏰ À regarder',
+  favorites: '⭐ Favoris',
+};
+
+const statusColors = {
+  watching: 'from-blue-500/20 to-blue-500/5 border-blue-500/30',
+  completed: 'from-green-500/20 to-green-500/5 border-green-500/30',
+  planned: 'from-amber-500/20 to-amber-500/5 border-amber-500/30',
+  favorites: 'from-rose-500/20 to-rose-500/5 border-rose-500/30',
+};
 
 const SharedListPage = () => {
-  const { code } = useParams<{ code: string }>();
-  const [data, setData] = useState<SharedData | null>(null);
+  const { userId, listType } = useParams<{ userId: string; listType: string }>();
+  const navigate = useNavigate();
+  const [owner, setOwner] = useState<Profile | null>(null);
+  const [items, setItems] = useState<AnimeListItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (code) {
-      fetchSharedList(code);
+    if (userId && listType) {
+      fetchSharedList();
     }
-  }, [code]);
+  }, [userId, listType]);
 
-  const fetchSharedList = async (shareCode: string) => {
+  const fetchSharedList = async () => {
     try {
-      // Validate share code format
-      if (!shareCode || shareCode.length < 8 || !/^[a-f0-9]+$/i.test(shareCode)) {
-        setError('Code de partage invalide');
-        return;
-      }
+      setIsLoading(true);
+      setError(null);
 
-      // Get the shared list
-      const { data: share, error: shareError } = await supabase
-        .from('shared_lists')
-        .select('*')
-        .eq('share_code', shareCode)
-        .maybeSingle();
-
-      if (shareError) {
-        console.error('Share error:', shareError);
-        setError('Erreur lors du chargement');
-        return;
-      }
-
-      if (!share) {
-        setError('Lien de partage invalide ou expiré');
-        return;
-      }
-
-      // Check expiration
-      if (share.expires_at && new Date(share.expires_at) < new Date()) {
-        setError('Ce lien de partage a expiré');
-        return;
-      }
-
-      // Get owner profile
-      const { data: owner } = await supabase
+      // Vérifier les permissions de partage
+      const { data: profile, error: profileError } = await supabase
         .from('profiles')
         .select('*')
-        .eq('user_id', share.owner_id)
-        .maybeSingle();
+        .eq('user_id', userId)
+        .single();
 
-      // Get anime items based on list type
-      let itemsQuery = supabase
+      if (profileError) {
+        console.error('❌ Erreur profil:', profileError);
+        setError('Profil non trouvé');
+        return;
+      }
+
+      if (!profile) {
+        setError('Utilisateur introuvable');
+        return;
+      }
+
+      // Vérifier permission de partage
+      const shareField = `share_${listType}` as keyof typeof profile;
+      const sharePermission = profile[shareField];
+
+      if (sharePermission === 'none') {
+        setError('Cette liste n\'est pas partagée');
+        return;
+      }
+
+      setOwner(profile);
+
+      // Charger les animes
+      const { data: listItems, error: itemsError } = await supabase
         .from('anime_lists')
         .select('*')
-        .eq('user_id', share.owner_id);
-
-      if (share.list_type !== 'all') {
-        itemsQuery = itemsQuery.eq('status', share.list_type);
-      }
-
-      const { data: items, error: itemsError } = await itemsQuery.order('updated_at', { ascending: false });
+        .eq('user_id', userId)
+        .eq('status', listType)
+        .order('date_added', { ascending: false });
 
       if (itemsError) {
-        console.error('Items error:', itemsError);
+        console.error('❌ Erreur chargement animes:', itemsError);
+        setError('Erreur lors du chargement de la liste');
+        return;
       }
 
-      // Increment view count (don't await to speed up page load)
-      supabase
-        .from('shared_lists')
-        .update({ view_count: (share.view_count || 0) + 1 })
-        .eq('id', share.id)
-        .then(() => {});
-
-      setData({
-        share,
-        owner,
-        items: items || [],
-      });
+      setItems(listItems || []);
+      console.log(`✅ Liste "${listType}" chargée: ${(listItems || []).length} anime(s)`);
+      
     } catch (err) {
-      console.error('Error fetching shared list:', err);
-      setError('Erreur lors du chargement');
+      console.error('❌ Erreur:', err);
+      setError('Une erreur est survenue');
     } finally {
       setIsLoading(false);
     }
   };
 
-  const getStatusLabel = (status: string) => {
-    switch (status) {
-      case 'watching': return 'En cours';
-      case 'completed': return 'Terminé';
-      case 'planned': return 'À voir';
-      case 'favorites': return 'Favoris';
-      default: return status;
-    }
-  };
-
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'watching': return 'text-status-watching';
-      case 'completed': return 'text-rating-green';
-      case 'planned': return 'text-status-planned';
-      case 'favorites': return 'text-primary';
-      default: return 'text-muted-foreground';
-    }
-  };
-
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      <div className="min-h-screen bg-gradient-to-b from-background to-background/80 flex items-center justify-center">
+        <motion.div
+          animate={{ rotate: 360 }}
+          transition={{ duration: 2, repeat: Infinity }}
+          className="flex flex-col items-center gap-3"
+        >
+          <Loader2 className="w-8 h-8 text-primary" />
+          <p className="text-muted-foreground">Chargement de la liste...</p>
+        </motion.div>
       </div>
     );
   }
 
-  if (error || !data) {
+  if (error) {
     return (
-      <div className="min-h-screen bg-background flex flex-col items-center justify-center px-6 text-center">
-        <div className="w-16 h-16 rounded-2xl bg-destructive/10 flex items-center justify-center mb-4">
-          <AlertCircle className="w-8 h-8 text-destructive" />
-        </div>
-        <h1 className="text-xl font-bold text-foreground mb-2">Oops !</h1>
-        <p className="text-muted-foreground">{error || 'Liste introuvable'}</p>
+      <div className="min-h-screen bg-gradient-to-b from-background to-background/80 flex items-center justify-center p-4">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="max-w-md w-full space-y-4"
+        >
+          <div className="glass-card border border-red-500/30 rounded-xl p-6 text-center space-y-3">
+            <div className="flex justify-center">
+              <div className="bg-red-500/20 rounded-full p-3">
+                <AlertCircle className="w-6 h-6 text-red-500" />
+              </div>
+            </div>
+            <h2 className="text-lg font-bold text-foreground">{error}</h2>
+            <p className="text-sm text-muted-foreground">
+              Cette liste n'est pas disponible ou a été supprimée
+            </p>
+            <button
+              onClick={() => navigate('/')}
+              className="w-full btn-primary rounded-lg mt-4"
+            >
+              ← Retour à l'accueil
+            </button>
+          </div>
+        </motion.div>
       </div>
     );
   }
-
-  const { share, owner, items } = data;
 
   return (
-    <div className="min-h-screen bg-background pb-8">
-      {/* Header */}
-      <header className="sticky top-0 z-40 bg-background/80 backdrop-blur-xl border-b border-border">
-        <div className="px-4 py-4">
-          <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center overflow-hidden flex-shrink-0">
-              {owner?.discord_avatar ? (
-                <img src={owner.discord_avatar} alt="" className="w-full h-full object-cover" />
-              ) : (
-                <User className="w-6 h-6 text-primary" />
-              )}
-            </div>
-            <div className="flex-1 min-w-0">
-              <h1 className="font-bold text-foreground truncate">
-                {owner?.display_name || 'Utilisateur'}
-              </h1>
-              <p className="text-sm text-muted-foreground">
-                {share.list_type === 'all' ? 'Toutes les listes' : getStatusLabel(share.list_type)}
-                {' '}&bull;{' '}
-                {items.length} anime{items.length > 1 ? 's' : ''}
-              </p>
-            </div>
-            <div className="flex items-center gap-1.5 text-xs text-muted-foreground bg-secondary px-2 py-1 rounded-lg">
-              <Eye className="w-3.5 h-3.5" />
-              {share.view_count || 0}
-            </div>
-          </div>
-        </div>
-      </header>
+    <div className="min-h-screen bg-gradient-to-b from-background to-background/80">
+      {/* Back Button */}
+      <motion.button
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        onClick={() => window.history.back()}
+        className="fixed top-4 left-4 z-50 flex items-center gap-2 px-3 py-2 rounded-lg bg-primary/10 hover:bg-primary/20 text-primary transition-colors"
+      >
+        <ArrowLeft className="w-4 h-4" />
+        <span className="text-sm font-medium">Retour</span>
+      </motion.button>
 
-      {/* Anime Grid */}
-      <div className="px-4 py-4">
-        {items.length === 0 ? (
-          <div className="text-center py-12 text-muted-foreground">
-            <p>Cette liste est vide</p>
+      <div className="max-w-7xl mx-auto px-4 py-8">
+        {/* Header */}
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="space-y-4 mb-8"
+        >
+          {/* Owner Info */}
+          {owner && (
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary to-primary/50 flex items-center justify-center">
+                <User className="w-6 h-6 text-white" />
+              </div>
+              <div>
+                <p className="text-xs text-muted-foreground">Liste partagée par</p>
+                <p className="text-lg font-bold text-foreground">
+                  {owner.username || owner.display_name || 'Utilisateur'}
+                </p>
+              </div>
+            </div>
+          )}
+
+          {/* List Title */}
+          <div className={`glass-card border rounded-xl p-6 bg-gradient-to-br ${statusColors[listType as ListStatus] || 'from-primary/20 to-primary/5'}`}>
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-muted-foreground mb-1">Ma liste</p>
+                <h1 className="text-3xl font-bold text-foreground">
+                  {statusLabels[listType as ListStatus] || listType}
+                </h1>
+              </div>
+              <div className="bg-white/10 rounded-full px-4 py-2 backdrop-blur">
+                <p className="text-lg font-bold text-foreground">{items.length}</p>
+              </div>
+            </div>
           </div>
+        </motion.div>
+
+        {/* Content */}
+        {items.length === 0 ? (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="text-center py-12"
+          >
+            <div className="inline-block p-4 rounded-full bg-muted mb-4">
+              <Zap className="w-6 h-6 text-muted-foreground" />
+            </div>
+            <h3 className="text-lg font-semibold text-foreground mb-1">
+              Aucun anime dans cette liste
+            </h3>
+            <p className="text-muted-foreground text-sm">
+              {owner?.username || 'Cet utilisateur'} n'a pas encore ajouté d'anime à cette catégorie
+            </p>
+          </motion.div>
         ) : (
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
-            {items.map((item, index) => (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4"
+          >
+            {items.map((item, idx) => (
               <motion.div
                 key={item.id}
-                initial={{ opacity: 0, y: 20 }}
+                initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.03 }}
-                className="group"
+                transition={{ delay: idx * 0.05 }}
               >
-                <div className="relative aspect-[2/3] rounded-xl overflow-hidden bg-secondary">
-                  {item.anime_image ? (
-                    <img
-                      src={item.anime_image}
-                      alt={item.anime_title}
-                      className="w-full h-full object-cover"
-                      loading="lazy"
-                    />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center text-muted-foreground">
-                      📺
-                    </div>
-                  )}
-                  
-                  {/* Overlay */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
-                  
-                  {/* Status badge */}
-                  {share.list_type === 'all' && (
-                    <span className={`absolute top-2 left-2 text-[10px] font-medium px-1.5 py-0.5 rounded-md bg-black/50 ${getStatusColor(item.status)}`}>
-                      {getStatusLabel(item.status)}
-                    </span>
-                  )}
-                  
-                  {/* Rating */}
-                  {item.rating && (
-                    <div className="absolute top-2 right-2 flex items-center gap-0.5 text-xs font-medium bg-black/50 px-1.5 py-0.5 rounded-md">
-                      <Star className="w-3 h-3 text-rating-yellow fill-rating-yellow" />
-                      <span className="text-white">{item.rating}</span>
-                    </div>
-                  )}
-                  
-                  {/* Info */}
-                  <div className="absolute bottom-0 left-0 right-0 p-2">
-                    <p className="text-white text-xs font-medium line-clamp-2 leading-tight">
-                      {item.anime_title}
-                    </p>
-                    {item.progress !== null && item.total_episodes && (
-                      <div className="flex items-center gap-1 mt-1 text-[10px] text-white/70">
-                        <Clock className="w-3 h-3" />
-                        {item.progress}/{item.total_episodes}
-                      </div>
-                    )}
-                  </div>
-                </div>
+                <AnimeCard animeId={item.anime_id} />
               </motion.div>
             ))}
-          </div>
+          </motion.div>
         )}
-      </div>
-
-      {/* OtakuDB branding */}
-      <div className="text-center py-4">
-        <p className="text-xs text-muted-foreground">
-          Partagé via <span className="text-primary font-semibold">OtakuDB</span>
-        </p>
       </div>
     </div>
   );

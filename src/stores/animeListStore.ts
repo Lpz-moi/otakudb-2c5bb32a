@@ -1,5 +1,4 @@
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
 import type { Anime } from '@/services/jikanApi';
 
 export type ListStatus = 'watching' | 'completed' | 'planned' | 'favorites';
@@ -35,11 +34,13 @@ interface AnimeListState {
     totalEpisodes: number;
     averageRating: number;
   };
+  setItems: (items: Record<number, AnimeListItem>) => void;
+  clearItems: () => void;
 }
 
-export const useAnimeListStore = create<AnimeListState>()(
-  persist(
-    (set, get) => ({
+// 🔐 MEMORY ONLY - Données viennent de Supabase real-time
+// ❌ NO localStorage persist
+export const useAnimeListStore = create<AnimeListState>((set, get) => ({
       items: {},
 
       addToList: (anime, status) => {
@@ -191,9 +192,21 @@ export const useAnimeListStore = create<AnimeListState>()(
             : 0,
         };
       },
-    }),
-    {
-      name: 'otakudb-anime-list',
-    }
-  )
-);
+
+      getStatsByStatus: (status: ListStatus) => {
+        const state = get();
+        const items = Object.values(state.items);
+        return items.filter((i) => i.status === status).length;
+      },
+
+      // 🔐 Setters pour real-time sync
+      setItems: (items) => {
+        console.log(`📡 Mise à jour items: ${Object.keys(items).length} animes`);
+        set({ items });
+      },
+
+      clearItems: () => {
+        console.log('🧹 Effacement items');
+        set({ items: {} });
+      },
+    }));

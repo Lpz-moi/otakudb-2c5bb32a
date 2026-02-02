@@ -223,10 +223,6 @@ USING (
     )
 );
 
--- Public lists are only accessible via explicit public sharing mechanism
--- Do NOT allow public viewing through anime_lists table directly
--- Use shared_lists table with share_code for public access control
-
 -- ===========================================
 -- RLS Policies: Friendships
 -- ===========================================
@@ -317,36 +313,14 @@ CREATE TRIGGER update_friendships_updated_at
 -- ===========================================
 CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS TRIGGER AS $$
-DECLARE
-    v_display_name TEXT;
-    v_discord_id TEXT;
-    v_discord_username TEXT;
-    v_discord_avatar TEXT;
 BEGIN
-    -- Extract display_name with fallbacks
-    v_display_name := COALESCE(
-        NEW.raw_user_meta_data->>'full_name',
-        NEW.raw_user_meta_data->>'name',
-        (NEW.raw_user_meta_data->'custom_claims'->>'global_name'),
-        'Utilisateur'
-    );
-    
-    -- Extract Discord-specific fields
-    v_discord_id := NEW.raw_user_meta_data->>'provider_id';
-    v_discord_username := COALESCE(
-        (NEW.raw_user_meta_data->'custom_claims'->>'global_name'),
-        NEW.raw_user_meta_data->>'provider_id',
-        'discord_user'
-    );
-    v_discord_avatar := NEW.raw_user_meta_data->>'avatar_url';
-    
     INSERT INTO public.profiles (user_id, display_name, discord_id, discord_username, discord_avatar)
     VALUES (
         NEW.id,
-        v_display_name,
-        v_discord_id,
-        v_discord_username,
-        v_discord_avatar
+        COALESCE(NEW.raw_user_meta_data->>'full_name', NEW.raw_user_meta_data->>'name', 'Utilisateur'),
+        NEW.raw_user_meta_data->>'provider_id',
+        NEW.raw_user_meta_data->>'custom_claims'->>'global_name',
+        NEW.raw_user_meta_data->>'avatar_url'
     );
     
     -- Assign default user role

@@ -23,6 +23,7 @@ const AuthPage = () => {
   // Handle OAuth callback
   useEffect(() => {
     const code = searchParams.get('code');
+    const state = searchParams.get('state');
     const error = searchParams.get('error');
 
     if (error) {
@@ -33,7 +34,8 @@ const AuthPage = () => {
 
     if (code && !processingCallback) {
       setProcessingCallback(true);
-      handleCallback(code).then((result) => {
+      // CSRF PROTECTION: Include state parameter from OAuth response
+      handleCallback(code, state || '').then((result) => {
         if (result?.success) {
           toast.success(result.is_new_user ? 'Bienvenue sur OtakuDB !' : 'Connexion réussie');
         }
