@@ -29,14 +29,26 @@ const SharedListPage = () => {
 
   const fetchSharedList = async (shareCode: string) => {
     try {
+      // Validate share code format
+      if (!shareCode || shareCode.length < 8 || !/^[a-f0-9]+$/i.test(shareCode)) {
+        setError('Code de partage invalide');
+        return;
+      }
+
       // Get the shared list
       const { data: share, error: shareError } = await supabase
         .from('shared_lists')
         .select('*')
         .eq('share_code', shareCode)
-        .single();
+        .maybeSingle();
 
-      if (shareError || !share) {
+      if (shareError) {
+        console.error('Share error:', shareError);
+        setError('Erreur lors du chargement');
+        return;
+      }
+
+      if (!share) {
         setError('Lien de partage invalide ou expiré');
         return;
       }
@@ -52,7 +64,7 @@ const SharedListPage = () => {
         .from('profiles')
         .select('*')
         .eq('user_id', share.owner_id)
-        .single();
+        .maybeSingle();
 
       // Get anime items based on list type
       let itemsQuery = supabase
@@ -64,13 +76,18 @@ const SharedListPage = () => {
         itemsQuery = itemsQuery.eq('status', share.list_type);
       }
 
-      const { data: items } = await itemsQuery.order('updated_at', { ascending: false });
+      const { data: items, error: itemsError } = await itemsQuery.order('updated_at', { ascending: false });
 
-      // Increment view count
-      await supabase
+      if (itemsError) {
+        console.error('Items error:', itemsError);
+      }
+
+      // Increment view count (don't await to speed up page load)
+      supabase
         .from('shared_lists')
         .update({ view_count: (share.view_count || 0) + 1 })
-        .eq('id', share.id);
+        .eq('id', share.id)
+        .then(() => {});
 
       setData({
         share,
