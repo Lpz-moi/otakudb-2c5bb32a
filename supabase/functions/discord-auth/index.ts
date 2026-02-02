@@ -6,10 +6,20 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version',
 };
 
-const DISCORD_CLIENT_ID = Deno.env.get('DISCORD_CLIENT_ID')!;
-const DISCORD_CLIENT_SECRET = Deno.env.get('DISCORD_CLIENT_SECRET')!;
-const SUPABASE_URL = Deno.env.get('SUPABASE_URL')!;
-const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+const DISCORD_CLIENT_ID = Deno.env.get('DISCORD_CLIENT_ID');
+const DISCORD_CLIENT_SECRET = Deno.env.get('DISCORD_CLIENT_SECRET');
+const SUPABASE_URL = Deno.env.get('SUPABASE_URL');
+const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
+
+// Validate required environment variables
+const validateEnv = (): string[] => {
+  const missing: string[] = [];
+  if (!DISCORD_CLIENT_ID) missing.push('DISCORD_CLIENT_ID');
+  if (!DISCORD_CLIENT_SECRET) missing.push('DISCORD_CLIENT_SECRET');
+  if (!SUPABASE_URL) missing.push('SUPABASE_URL');
+  if (!SUPABASE_SERVICE_ROLE_KEY) missing.push('SUPABASE_SERVICE_ROLE_KEY');
+  return missing;
+};
 
 interface DiscordUser {
   id: string;
@@ -27,6 +37,16 @@ serve(async (req) => {
   }
 
   try {
+    // Validate environment first
+    const missingEnv = validateEnv();
+    if (missingEnv.length > 0) {
+      console.error('Missing environment variables:', missingEnv);
+      return new Response(
+        JSON.stringify({ error: 'Server configuration error', details: `Missing: ${missingEnv.join(', ')}` }),
+        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
     const url = new URL(req.url);
     const action = url.searchParams.get('action');
 
@@ -36,7 +56,7 @@ serve(async (req) => {
       const state = crypto.randomUUID();
       
       const discordAuthUrl = new URL('https://discord.com/api/oauth2/authorize');
-      discordAuthUrl.searchParams.set('client_id', DISCORD_CLIENT_ID);
+      discordAuthUrl.searchParams.set('client_id', DISCORD_CLIENT_ID!);
       discordAuthUrl.searchParams.set('redirect_uri', redirectUri);
       discordAuthUrl.searchParams.set('response_type', 'code');
       discordAuthUrl.searchParams.set('scope', 'identify email guilds');
@@ -70,8 +90,8 @@ serve(async (req) => {
           'Content-Type': 'application/x-www-form-urlencoded',
         },
         body: new URLSearchParams({
-          client_id: DISCORD_CLIENT_ID,
-          client_secret: DISCORD_CLIENT_SECRET,
+          client_id: DISCORD_CLIENT_ID!,
+          client_secret: DISCORD_CLIENT_SECRET!,
           grant_type: 'authorization_code',
           code,
           redirect_uri,
@@ -107,7 +127,7 @@ serve(async (req) => {
       const discordUser: DiscordUser = await userResponse.json();
 
       // Create Supabase admin client
-      const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
+      const supabase = createClient(SUPABASE_URL!, SUPABASE_SERVICE_ROLE_KEY!);
 
       // Check if user exists
       const { data: existingUsers } = await supabase

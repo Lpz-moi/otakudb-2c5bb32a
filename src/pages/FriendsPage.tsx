@@ -48,16 +48,23 @@ const FriendsPage = () => {
       const pending: FriendWithProfile[] = [];
       const sent: FriendWithProfile[] = [];
 
+      // Fetch all friend profiles in a single batch
+      const friendIds = (friendships || []).map(f => 
+        f.requester_id === user.id ? f.addressee_id : f.requester_id
+      );
+
+      const { data: profiles } = friendIds.length > 0 
+        ? await supabase
+            .from('profiles')
+            .select('*')
+            .in('user_id', friendIds)
+        : { data: [] };
+
+      const profileMap = new Map((profiles || []).map(p => [p.user_id, p]));
+
       for (const f of friendships || []) {
         const friendId = f.requester_id === user.id ? f.addressee_id : f.requester_id;
-        
-        // Fetch friend profile
-        const { data: friendProfile } = await supabase
-          .from('profiles')
-          .select('*')
-          .eq('user_id', friendId)
-          .single();
-
+        const friendProfile = profileMap.get(friendId);
         const friendWithProfile = { ...f, friend_profile: friendProfile || undefined };
 
         if (f.status === 'accepted') {
@@ -83,24 +90,28 @@ const FriendsPage = () => {
   };
 
   const searchUsers = async (query: string) => {
-    if (!query.trim() || query.length < 2) {
+    if (!query.trim() || query.length < 3) {
       setSearchResults([]);
       return;
     }
 
     setIsSearching(true);
     try {
+      // Sanitize input
+      const sanitizedQuery = query.trim().replace(/[%_]/g, '');
+      
       const { data, error } = await supabase
         .from('profiles')
         .select('*')
-        .or(`display_name.ilike.%${query}%,discord_username.ilike.%${query}%`)
-        .neq('user_id', user?.id)
+        .or(`display_name.ilike.%${sanitizedQuery}%,discord_username.ilike.%${sanitizedQuery}%`)
+        .neq('user_id', user?.id || '')
         .limit(10);
 
       if (error) throw error;
       setSearchResults(data || []);
     } catch (err) {
       console.error('Search error:', err);
+      toast.error('Erreur de recherche');
     } finally {
       setIsSearching(false);
     }
@@ -297,9 +308,13 @@ const FriendsPage = () => {
                   </div>
                 ))}
               </div>
-            ) : searchQuery.length >= 2 ? (
+            ) : searchQuery.length >= 3 ? (
               <p className="text-center text-muted-foreground text-sm py-8">
                 Aucun utilisateur trouvé
+              </p>
+            ) : searchQuery.length > 0 ? (
+              <p className="text-center text-muted-foreground text-sm py-8">
+                Entrez au moins 3 caractères
               </p>
             ) : null}
           </motion.div>

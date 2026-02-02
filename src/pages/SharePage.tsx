@@ -86,9 +86,13 @@ const SharePage = () => {
   };
 
   const copyShareLink = async (shareCode: string) => {
-    const url = `${window.location.origin}/share/${shareCode}`;
-    await navigator.clipboard.writeText(url);
-    toast.success('Lien copié !');
+    try {
+      const url = `${window.location.origin}/share/${shareCode}`;
+      await navigator.clipboard.writeText(url);
+      toast.success('Lien copié !');
+    } catch (err) {
+      toast.error('Impossible de copier le lien');
+    }
   };
 
   const deleteShareLink = async (id: string) => {
