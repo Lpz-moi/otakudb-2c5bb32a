@@ -34,9 +34,29 @@ const registerServiceWorker = async () => {
   }
 };
 
+const shouldUseServiceWorker = () => {
+  // Prevent SW issues on preview/dev environments where assets are not hashed
+  if (!import.meta.env.PROD) return false;
+  const host = window.location.hostname;
+  if (host.includes('lovableproject.com')) return false;
+  if (host.includes('id-preview')) return false;
+  return true;
+};
+
+const unregisterAllServiceWorkers = async () => {
+  if (!('serviceWorker' in navigator)) return;
+  const regs = await navigator.serviceWorker.getRegistrations();
+  await Promise.all(regs.map((r) => r.unregister()));
+};
+
 const App = () => {
   useEffect(() => {
-    registerServiceWorker();
+    if (shouldUseServiceWorker()) {
+      registerServiceWorker();
+    } else {
+      // If a SW was registered previously on preview, remove it to avoid stale bundles.
+      unregisterAllServiceWorkers().catch(() => {});
+    }
   }, []);
 
   return (
