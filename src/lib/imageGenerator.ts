@@ -78,7 +78,7 @@ export const generateShareImage = async (
   // Username
   ctx.font = 'bold 32px "Inter", sans-serif';
   ctx.fillStyle = '#FFFFFF';
-  const username = profile.username || profile.display_name || 'Utilisateur';
+  const username = profile.display_name || profile.discord_username || 'Utilisateur';
   ctx.fillText(username, avatarX + avatarSize + 30, avatarY + 45);
 
   // Subtitle

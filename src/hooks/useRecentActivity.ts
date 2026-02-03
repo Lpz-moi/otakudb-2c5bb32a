@@ -8,9 +8,8 @@ export interface ActivityLogEntry {
   anime_id: number;
   anime_title: string;
   anime_image: string | null;
-  action_type: 'added' | 'completed' | 'status_changed' | 'rating_changed';
-  old_value: string | null;
-  new_value: string | null;
+  activity_type: 'added' | 'completed' | 'rated' | 'favorited' | 'started_watching';
+  details?: Record<string, unknown> | null;
   created_at: string;
 }
 
@@ -35,8 +34,9 @@ export const useRecentActivity = (limit: number = 10) => {
       setLoading(true);
       setError(null);
 
+      // Use the 'activities' table which exists in the schema
       const { data, error: err } = await supabase
-        .from('activity_log')
+        .from('activities')
         .select('*')
         .eq('user_id', user.id)
         .order('created_at', { ascending: false })
@@ -48,7 +48,19 @@ export const useRecentActivity = (limit: number = 10) => {
         return;
       }
 
-      setActivities(data || []);
+      // Transform activities data to match our interface
+      const transformedData: ActivityLogEntry[] = (data || []).map(item => ({
+        id: item.id,
+        user_id: item.user_id,
+        anime_id: item.anime_id,
+        anime_title: item.anime_title,
+        anime_image: item.anime_image,
+        activity_type: item.activity_type as ActivityLogEntry['activity_type'],
+        details: item.details as Record<string, unknown> | null,
+        created_at: item.created_at,
+      }));
+
+      setActivities(transformedData);
     } catch (err) {
       console.error('❌ Erreur:', err);
       setError('Une erreur est survenue');
@@ -73,7 +85,7 @@ export const useRecentActivity = (limit: number = 10) => {
         {
           event: 'INSERT',
           schema: 'public',
-          table: 'activity_log',
+          table: 'activities',
           filter: `user_id=eq.${user.id}`,
         },
         (payload) => {

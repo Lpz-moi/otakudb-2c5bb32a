@@ -25,7 +25,7 @@ const HomePage = () => {
   const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<TabValue>('watching');
 
-  const { getItemsByStatus, getStats, items, favorites } = useAnimeListStore();
+  const { getItemsByStatus, getStats } = useAnimeListStore();
   const { user, profile } = useAuth();
   const stats = getStats();
   
@@ -33,7 +33,7 @@ const HomePage = () => {
   const watching = getItemsByStatus('watching');
   const completed = getItemsByStatus('completed');
   const planned = getItemsByStatus('planned');
-  const favoritesArray = watching.filter(item => favorites.includes(item.malId || item.anime?.mal_id));
+  const favoritesArray = getItemsByStatus('favorites');
 
   useEffect(() => {
     const fetchData = async () => {

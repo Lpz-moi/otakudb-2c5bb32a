@@ -12,7 +12,7 @@ type SharePermission = Database['public']['Enums']['share_permission'];
 
 const SharePage = () => {
   const { user, profile, refreshProfile } = useAuth();
-  const { getStatsByStatus } = useAnimeListStore();
+  const { getStats } = useAnimeListStore();
   const [sharePermissions, setSharePermissions] = useState({
     watching: profile?.share_watching || 'friends_only',
     completed: profile?.share_completed || 'friends_only',
@@ -56,11 +56,12 @@ const SharePage = () => {
     return `${window.location.origin}/share/${user?.id}/${listType}`;
   };
 
+  const animeStats = getStats();
   const stats = {
-    watching: getStatsByStatus('watching'),
-    completed: getStatsByStatus('completed'),
-    planned: getStatsByStatus('planned'),
-    favorites: getStatsByStatus('favorites'),
+    watching: animeStats.watching,
+    completed: animeStats.completed,
+    planned: animeStats.planned,
+    favorites: animeStats.favorites,
   };
 
   if (!user) {
@@ -135,7 +136,7 @@ const SharePage = () => {
                 updatePermission(status, newPerm as SharePermission);
               }}
               shareUrl={getShareUrl(status)}
-              userName={profile?.username || user?.user_metadata?.discord_username || 'Utilisateur'}
+              userName={profile?.display_name || profile?.discord_username || 'Utilisateur'}
             />
           </motion.div>
         ))}

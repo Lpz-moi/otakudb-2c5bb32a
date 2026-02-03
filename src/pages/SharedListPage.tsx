@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 import { ArrowLeft, Loader2, AlertCircle, User, Zap } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import type { Database } from '@/integrations/supabase/types';
-import { AnimeCard } from '@/components/anime/AnimeCard';
+import { AnimeListCard } from '@/components/anime/AnimeListCard';
 import { toast } from 'sonner';
 
 type AnimeListItem = Database['public']['Tables']['anime_lists']['Row'];
@@ -172,7 +172,7 @@ const SharedListPage = () => {
               <div>
                 <p className="text-xs text-muted-foreground">Liste partagée par</p>
                 <p className="text-lg font-bold text-foreground">
-                  {owner.username || owner.display_name || 'Utilisateur'}
+                  {owner.display_name || owner.discord_username || 'Utilisateur'}
                 </p>
               </div>
             </div>
@@ -208,7 +208,7 @@ const SharedListPage = () => {
               Aucun anime dans cette liste
             </h3>
             <p className="text-muted-foreground text-sm">
-              {owner?.username || 'Cet utilisateur'} n'a pas encore ajouté d'anime à cette catégorie
+              {owner?.display_name || owner?.discord_username || 'Cet utilisateur'} n'a pas encore ajouté d'anime à cette catégorie
             </p>
           </motion.div>
         ) : (
@@ -224,7 +224,15 @@ const SharedListPage = () => {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: idx * 0.05 }}
               >
-                <AnimeCard animeId={item.anime_id} />
+                <AnimeListCard 
+                  animeId={item.anime_id}
+                  title={item.anime_title}
+                  image={item.anime_image}
+                  status={item.status}
+                  progress={item.progress || 0}
+                  totalEpisodes={item.total_episodes || undefined}
+                  rating={item.rating}
+                />
               </motion.div>
             ))}
           </motion.div>

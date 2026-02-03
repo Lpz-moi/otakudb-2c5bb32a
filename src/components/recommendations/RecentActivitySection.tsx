@@ -16,10 +16,12 @@ export const RecentActivitySection = () => {
         return { icon: Plus, color: 'text-blue-500', label: 'Ajouté' };
       case 'completed':
         return { icon: Check, color: 'text-green-500', label: 'Terminé' };
-      case 'status_changed':
-        return { icon: Zap, color: 'text-yellow-500', label: 'Statut changé' };
-      case 'rating_changed':
-        return { icon: Star, color: 'text-purple-500', label: 'Note changée' };
+      case 'started_watching':
+        return { icon: Zap, color: 'text-yellow-500', label: 'Commencé' };
+      case 'rated':
+        return { icon: Star, color: 'text-purple-500', label: 'Noté' };
+      case 'favorited':
+        return { icon: Star, color: 'text-rose-500', label: 'Favori' };
       default:
         return { icon: Clock, color: 'text-gray-500', label: 'Activité' };
     }
@@ -41,15 +43,18 @@ export const RecentActivitySection = () => {
 
   // Formater le message de l'activité
   const formatActivityMessage = (activity: ActivityLogEntry): string => {
-    switch (activity.action_type) {
+    const details = activity.details as Record<string, unknown> | null;
+    switch (activity.activity_type) {
       case 'added':
         return `a ajouté "${activity.anime_title}"`;
       case 'completed':
         return `a terminé "${activity.anime_title}"`;
-      case 'status_changed':
-        return `${activity.anime_title}: ${activity.old_value} → ${activity.new_value}`;
-      case 'rating_changed':
-        return `a noté "${activity.anime_title}": ${activity.new_value}/10`;
+      case 'started_watching':
+        return `a commencé "${activity.anime_title}"`;
+      case 'rated':
+        return `a noté "${activity.anime_title}": ${details?.rating || '?'}/10`;
+      case 'favorited':
+        return `a ajouté "${activity.anime_title}" aux favoris`;
       default:
         return `a mis à jour "${activity.anime_title}"`;
     }
@@ -111,7 +116,7 @@ export const RecentActivitySection = () => {
       <div className="space-y-2">
         <AnimatePresence mode="popLayout">
           {activities.map((activity, index) => {
-            const { icon: IconComponent, color, label } = getActionIcon(activity.action_type);
+            const { icon: IconComponent, color, label } = getActionIcon(activity.activity_type);
             const timeAgo = formatTimeAgo(activity.created_at);
             const message = formatActivityMessage(activity);
 
