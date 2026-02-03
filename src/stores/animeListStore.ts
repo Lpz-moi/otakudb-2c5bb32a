@@ -34,6 +34,7 @@ interface AnimeListState {
     totalEpisodes: number;
     averageRating: number;
   };
+  getStatsByStatus: (status: ListStatus) => number;
   setItems: (items: Record<number, AnimeListItem>) => void;
   clearItems: () => void;
 }

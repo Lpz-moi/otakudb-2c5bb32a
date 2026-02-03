@@ -258,6 +258,145 @@
     min-width: 44px;
     min-height: 44px;
   }
+
+  /* ========================================
+     DISCORD-STYLE COMPONENTS
+     ======================================== */
+  
+  /* Discord Navigation Item */
+  .discord-nav-item {
+    @apply relative flex items-center gap-3 px-4 py-3 rounded-lg text-muted-foreground transition-all duration-200;
+    margin-left: 4px;
+    margin-right: 8px;
+  }
+
+  .discord-nav-item:hover {
+    @apply bg-accent/50 text-sidebar-foreground;
+  }
+
+  .discord-nav-item-active {
+    @apply bg-primary/10 text-sidebar-foreground;
+  }
+
+  /* Discord Bottom Navigation */
+  .discord-bottom-nav {
+    @apply backdrop-blur-xl border-t border-border/30;
+    background-color: hsl(var(--card) / 0.98);
+    padding-bottom: max(0.5rem, env(safe-area-inset-bottom));
+  }
+
+  .discord-bottom-nav-item {
+    @apply relative flex flex-col items-center justify-center gap-0.5 flex-1 h-full py-2 transition-all duration-200 rounded-xl mx-0.5;
+  }
+
+  .discord-bottom-nav-item:active {
+    @apply scale-95;
+  }
+
+  .discord-bottom-nav-item-active {
+    @apply text-primary;
+  }
+
+  /* Discord Scrollbar */
+  .discord-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: hsl(var(--muted)) transparent;
+  }
+
+  .discord-scrollbar::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .discord-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .discord-scrollbar::-webkit-scrollbar-thumb {
+    background-color: hsl(var(--muted));
+    border-radius: 3px;
+  }
+
+  .discord-scrollbar::-webkit-scrollbar-thumb:hover {
+    background-color: hsl(var(--muted-foreground) / 0.5);
+  }
+
+  /* Discord Card */
+  .discord-card {
+    @apply bg-card border border-border/30 rounded-xl transition-all duration-200;
+    box-shadow: 0 1px 3px hsla(0 0% 0% / 0.1);
+  }
+
+  .discord-card:hover {
+    @apply border-border/50;
+    box-shadow: 0 4px 12px hsla(0 0% 0% / 0.15);
+    transform: translateY(-1px);
+  }
+
+  /* Discord Button */
+  .discord-btn {
+    @apply px-4 py-2.5 rounded-lg font-medium transition-all duration-200;
+  }
+
+  .discord-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px hsla(0 0% 0% / 0.2);
+  }
+
+  .discord-btn:active {
+    transform: translateY(0);
+  }
+
+  /* Discord Avatar */
+  .discord-avatar {
+    @apply rounded-full transition-all duration-200;
+  }
+
+  .discord-avatar:hover {
+    @apply ring-2 ring-primary/50;
+  }
+
+  /* Discord Badge */
+  .discord-badge {
+    @apply inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold;
+  }
+
+  /* Discord Status Indicator */
+  .discord-status {
+    @apply absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full border-2 border-card;
+  }
+
+  .discord-status-online {
+    @apply bg-emerald-500;
+  }
+
+  .discord-status-offline {
+    @apply bg-gray-500;
+  }
+
+  .discord-status-busy {
+    @apply bg-red-500;
+  }
+
+  .discord-status-idle {
+    @apply bg-amber-500;
+  }
+
+  /* Discord Tooltip */
+  .discord-tooltip {
+    @apply absolute z-50 px-3 py-2 text-sm font-medium text-white bg-gray-900 rounded-lg shadow-lg;
+    animation: tooltipFadeIn 0.15s ease-out;
+  }
+
+  @keyframes tooltipFadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(4px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
 }
 
 @layer utilities {

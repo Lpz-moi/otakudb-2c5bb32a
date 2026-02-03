@@ -1,37 +1,37 @@
 import { Outlet } from 'react-router-dom';
-import { Sidebar } from './Sidebar';
-import { Header } from './Header';
-import { BottomNav } from './BottomNav';
+import { DiscordSidebar } from './DiscordSidebar';
+import { DiscordHeader } from './DiscordHeader';
+import { DiscordBottomNav } from './DiscordBottomNav';
 
 /**
- * 🎨 LAYOUT PROFESSIONNEL
+ * 🎨 LAYOUT DISCORD-STYLE
  * 
  * Structure:
- * - Header: full-width, sticky top
+ * - Header: mobile only, with burger menu
  * - Main container: flex row
- *   - Sidebar: hidden on mobile, side-by-side on desktop
+ *   - Sidebar: hidden on mobile, visible on desktop
  *   - Content: flex-1, scrollable
  * - BottomNav: mobile only
  */
 export const Layout = () => {
   return (
-    <div className="min-h-screen bg-background text-foreground flex flex-col">
-      {/* Header - Fixed top, full width */}
-      <Header />
+    <div className="min-h-screen bg-background text-foreground flex">
+      {/* Sidebar - Desktop only */}
+      <DiscordSidebar />
       
-      {/* Main container - Header height handled by header itself */}
-      <div className="flex flex-1 overflow-hidden">
-        {/* Sidebar - Hidden on mobile (md:flex shows it on desktop) */}
-        <Sidebar />
+      {/* Main content area */}
+      <div className="flex-1 flex flex-col min-w-0">
+        {/* Header - Mobile only */}
+        <DiscordHeader />
         
         {/* Content area - Takes remaining space, with bottom padding for mobile nav */}
-        <main className="flex-1 flex flex-col overflow-auto pb-20 md:pb-0">
+        <main className="flex-1 overflow-auto pb-20 md:pb-0">
           <Outlet />
         </main>
       </div>
       
       {/* Bottom nav - Mobile only */}
-      <BottomNav />
+      <DiscordBottomNav />
     </div>
   );
 };

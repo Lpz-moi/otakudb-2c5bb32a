@@ -111,7 +111,7 @@ const FriendsPage = () => {
       // Supabase handles parameter escaping automatically
       const { data, error } = await supabase
         .from('profiles')
-        .select('id, user_id, display_name, discord_username, discord_avatar, total_anime, total_episodes')
+        .select('*')
         .or(`display_name.ilike.%${sanitizedQuery}%,discord_username.ilike.%${sanitizedQuery}%`)
         .neq('user_id', user?.id || '')
         .limit(10);
