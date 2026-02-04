@@ -1,118 +1,132 @@
-import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
-import { User, Session } from '@supabase/supabase-js';
-import { supabase } from '@/integrations/supabase/client';
-import type { Database } from '@/integrations/supabase/types';
-
-type Profile = Database['public']['Tables']['profiles']['Row'];
+import React, { createContext, useContext, useState, useEffect, useRef, useCallback } from 'react';
+import { useLoadingState, LoadingState } from '@/hooks/useLoadingState';
+import { loadingStages } from '@/lib/loading-messages';
+import { InitialLoadingScreen } from '@/components/ui/InitialLoadingScreen';
 
 interface AuthContextType {
-  user: User | null;
-  session: Session | null;
-  profile: Profile | null;
-  isLoading: boolean;
-  isAuthenticated: boolean;
+  user: any | null;
+  authLoading: LoadingState;
+  signInWithDiscord: () => Promise<void>;
   signOut: () => Promise<void>;
-  refreshProfile: () => Promise<void>;
+  viewUserList: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export const useAuth = () => {
-  const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
-  return context;
-};
+const wait = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
-export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [user, setUser] = useState<User | null>(null);
-  const [session, setSession] = useState<Session | null>(null);
-  const [profile, setProfile] = useState<Profile | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+export function AuthProvider({ children }: { children: React.ReactNode }) {
+  const [user, setUser] = useState<any | null>(null);
+  const { state: authLoading, startLoading, updateProgress, completeLoading, failLoading } = useLoadingState();
+  const loadingSequenceRef = useRef(false);
 
-  const fetchProfile = useCallback(async (userId: string) => {
-    try {
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('user_id', userId)
-        .single();
+  // Séquence de chargement unifiée
+  const runDemoLoad = useCallback(async () => {
+    if (loadingSequenceRef.current) return;
+    loadingSequenceRef.current = true;
 
-      if (error) {
-        console.error('Error fetching profile:', error);
-        return null;
-      }
-      return data;
-    } catch (err) {
-      console.error('Profile fetch error:', err);
-      return null;
-    }
-  }, []);
+    startLoading("Démarrage de l'application...");
+    await wait(2000);
+    updateProgress(20, "Initialisation du moteur...");
+    await wait(3000);
+    updateProgress(45, "Chargement des modules...");
+    await wait(3000);
+    updateProgress(70, "Vérification de la session...");
+    await wait(3000);
+    updateProgress(90, "Préparation de l'interface...");
+    await wait(2000);
+    completeLoading();
+    loadingSequenceRef.current = false;
+  }, [startLoading, updateProgress, completeLoading]);
 
-  const refreshProfile = useCallback(async () => {
-    if (user?.id) {
-      const profileData = await fetchProfile(user.id);
-      setProfile(profileData);
-    }
-  }, [user?.id, fetchProfile]);
-
+  // GESTION DU CYCLE DE VIE (Démarrage + Retour Mobile/Tab)
   useEffect(() => {
-    // Set up auth state listener FIRST
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, newSession) => {
-        setSession(newSession);
-        setUser(newSession?.user ?? null);
-        
-        // Defer profile fetch with setTimeout
-        if (newSession?.user) {
-          setTimeout(() => {
-            fetchProfile(newSession.user.id).then(setProfile);
-          }, 0);
-        } else {
-          setProfile(null);
-        }
-      }
-    );
+    runDemoLoad();
 
-    // THEN check for existing session
-    supabase.auth.getSession().then(({ data: { session: existingSession } }) => {
-      setSession(existingSession);
-      setUser(existingSession?.user ?? null);
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        runDemoLoad();
+      }
+    };
+
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    return () => {
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+    };
+  }, [runDemoLoad]);
+
+  // Simulation de la connexion pour la démo
+  const signInWithDiscord = async () => {
+    try {
+      startLoading(loadingStages.auth);
+      updateProgress(5, loadingStages.auth);
+
+      // 1. Auth Simulation
+      await wait(3000);
+      updateProgress(30, loadingStages.profile);
+
+      // 2. Profile Fetch Simulation
+      await wait(4000);
+      updateProgress(60, loadingStages.sync);
+
+      // 3. Sync Simulation
+      await wait(3000);
+      updateProgress(85, loadingStages.ready);
+
+      // 4. Finalize
+      await wait(2000);
       
-      if (existingSession?.user) {
-        fetchProfile(existingSession.user.id).then(profileData => {
-          setProfile(profileData);
-          setIsLoading(false);
-        });
-      } else {
-        setIsLoading(false);
-      }
-    });
-
-    return () => subscription.unsubscribe();
-  }, [fetchProfile]);
-
-  const signOut = async () => {
-    await supabase.auth.signOut();
-    setUser(null);
-    setSession(null);
-    setProfile(null);
+      setUser({ id: '1', name: 'OtakuUser', avatar: 'https://github.com/shadcn.png' });
+      completeLoading();
+    } catch (error) {
+      failLoading("Erreur lors de la connexion.");
+      console.error(error);
+    }
   };
 
-  const value: AuthContextType = {
-    user,
-    session,
-    profile,
-    isLoading,
-    isAuthenticated: !!user,
-    signOut,
-    refreshProfile,
+  const signOut = async () => {
+    startLoading("Déconnexion en cours...");
+    await wait(2000);
+    updateProgress(30, "Sauvegarde des préférences...");
+    await wait(3000);
+    updateProgress(60, "Nettoyage du cache...");
+    await wait(3000);
+    updateProgress(90, "Fermeture de la session...");
+    await wait(2000);
+    setUser(null);
+    completeLoading();
+  };
+
+  const viewUserList = async () => {
+    startLoading("Chargement de vos listes...");
+    await wait(2000);
+    updateProgress(20, "Récupération des animes...");
+    await wait(3000);
+    updateProgress(50, "Traitement des images...");
+    await wait(3000);
+    updateProgress(80, "Organisation de la grille...");
+    await wait(3000);
+    completeLoading();
   };
 
   return (
-    <AuthContext.Provider value={value}>
+    <AuthContext.Provider value={{ user, authLoading, signInWithDiscord, signOut, viewUserList }}>
+      {authLoading.isLoading && (
+        <InitialLoadingScreen 
+          stage={authLoading.currentStep}
+          progress={authLoading.progress}
+          message={authLoading.currentStep}
+        />
+      )}
       {children}
     </AuthContext.Provider>
   );
-};
+}
+
+export function useAuth() {
+  const context = useContext(AuthContext);
+  if (context === undefined) {
+    throw new Error('useAuth must be used within an AuthProvider');
+  }
+  return context;
+}

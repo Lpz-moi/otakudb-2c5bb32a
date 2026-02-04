@@ -100,6 +100,22 @@ export default {
           "0%": { opacity: "0", transform: "translateX(-10px)" },
           "100%": { opacity: "1", transform: "translateX(0)" },
         },
+        shimmer: {
+          '0%': { transform: 'translateX(-100%)' },
+          '100%': { transform: 'translateX(100%)' }
+        },
+        wave: {
+          '0%, 100%': { opacity: '0.4' },
+          '50%': { opacity: '0.8' }
+        },
+        scan: {
+          '0%': { transform: 'translateY(-100%)' },
+          '100%': { transform: 'translateY(100%)' }
+        },
+        'fade-in-up': {
+          '0%': { opacity: '0', transform: 'translateY(10px)' },
+          '100%': { opacity: '1', transform: 'translateY(0)' }
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
@@ -107,6 +123,10 @@ export default {
         "fade-in": "fade-in 0.3s ease-out forwards",
         "scale-in": "scale-in 0.2s ease-out forwards",
         "slide-in": "slide-in 0.3s ease-out forwards",
+        shimmer: 'shimmer 2s infinite',
+        wave: 'wave 1.5s ease-in-out infinite',
+        scan: 'scan 2s ease-in-out infinite',
+        'fade-in-up': 'fade-in-up 0.4s ease-out',
       },
       boxShadow: {
         'card': 'var(--shadow-card)',

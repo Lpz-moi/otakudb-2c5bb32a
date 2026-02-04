@@ -1,12 +1,13 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { User, Info, Trash2, Edit2, Check, X, Shield, LogOut, Users, Share2, Loader2 } from 'lucide-react';
+import { User, Trash2, Edit2, Check, X, Shield, LogOut, Share2, Loader2, HelpCircle } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useAnimeListStore } from '@/stores/animeListStore';
 import { useUserPreferencesStore } from '@/stores/userPreferencesStore';
 import { useAuth } from '@/contexts/AuthContext';
 import { useDiscordAuth } from '@/hooks/useDiscordAuth';
 import { toast } from 'sonner';
+import { PageLoader } from './PageLoader';
 
 // Discord logo SVG
 const DiscordIcon = ({ className = "w-5 h-5" }: { className?: string }) => (
@@ -95,11 +96,7 @@ const ProfilePage = () => {
   };
 
   if (authLoading) {
-    return (
-      <div className="page-container flex items-center justify-center min-h-[60vh]">
-        <Loader2 className="w-8 h-8 animate-spin text-primary" />
-      </div>
-    );
+    return <PageLoader />;
   }
 
   return (
@@ -118,7 +115,7 @@ const ProfilePage = () => {
           </div>
           <h2 className="text-base font-bold text-foreground mb-2">Connectez-vous avec Discord</h2>
           <p className="text-sm text-muted-foreground mb-4 leading-relaxed">
-            Synchronisez vos listes, partagez avec vos amis et accédez à vos données partout.
+            Synchronisez vos listes et accédez à vos données partout.
           </p>
           <motion.button
             onClick={handleDiscordLogin}
@@ -272,19 +269,6 @@ const ProfilePage = () => {
           </h3>
           
           <button 
-            onClick={() => navigate('/friends')}
-            className="w-full glass-card p-3.5 flex items-center gap-3 hover:bg-card-hover transition-colors active:scale-[0.99]"
-          >
-            <div className="w-9 h-9 rounded-xl bg-violet-500/10 flex items-center justify-center">
-              <Users className="w-4 h-4 text-violet-500" />
-            </div>
-            <div className="flex-1 text-left">
-              <p className="font-medium text-sm text-foreground">Découvrir</p>
-              <p className="text-[11px] text-muted-foreground">Amis et leurs listes</p>
-            </div>
-          </button>
-
-          <button 
             onClick={() => navigate('/share')}
             className="w-full glass-card p-3.5 flex items-center gap-3 hover:bg-card-hover transition-colors active:scale-[0.99]"
           >
@@ -294,6 +278,19 @@ const ProfilePage = () => {
             <div className="flex-1 text-left">
               <p className="font-medium text-sm text-foreground">Partager</p>
               <p className="text-[11px] text-muted-foreground">Vos listes publiques</p>
+            </div>
+          </button>
+
+          <button 
+            onClick={() => navigate('/how-it-works')}
+            className="w-full glass-card p-3.5 flex items-center gap-3 hover:bg-card-hover transition-colors active:scale-[0.99]"
+          >
+            <div className="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center">
+              <HelpCircle className="w-4 h-4 text-primary" />
+            </div>
+            <div className="flex-1 text-left">
+              <p className="font-medium text-sm text-foreground">Comment ça marche</p>
+              <p className="text-[11px] text-muted-foreground">Guide d'utilisation</p>
             </div>
           </button>
         </div>
@@ -377,7 +374,7 @@ const ProfilePage = () => {
             <div className="flex-1">
               <h3 className="font-bold text-sm text-foreground mb-1">Synchroniser avec Discord</h3>
               <p className="text-xs text-muted-foreground mb-3 leading-relaxed">
-                Connectez-vous pour synchroniser vos données et les partager avec vos amis.
+                Connectez-vous pour synchroniser vos données.
               </p>
               <button
                 onClick={handleDiscordLogin}

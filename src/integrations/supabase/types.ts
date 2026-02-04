@@ -92,162 +92,6 @@ export type Database = {
         }
         Relationships: []
       }
-      anime_review_summary: {
-        Row: {
-          anime_id: number
-          anime_image: string | null
-          anime_title: string
-          average_rating: number | null
-          common_negatives: Json | null
-          common_positives: Json | null
-          created_at: string
-          last_calculated_at: string | null
-          rating_1_2: number | null
-          rating_3_4: number | null
-          rating_5_6: number | null
-          rating_7_8: number | null
-          rating_9_10: number | null
-          recommendation_percent: number | null
-          top_tags: Json | null
-          total_reviews: number | null
-        }
-        Insert: {
-          anime_id: number
-          anime_image?: string | null
-          anime_title: string
-          average_rating?: number | null
-          common_negatives?: Json | null
-          common_positives?: Json | null
-          created_at?: string
-          last_calculated_at?: string | null
-          rating_1_2?: number | null
-          rating_3_4?: number | null
-          rating_5_6?: number | null
-          rating_7_8?: number | null
-          rating_9_10?: number | null
-          recommendation_percent?: number | null
-          top_tags?: Json | null
-          total_reviews?: number | null
-        }
-        Update: {
-          anime_id?: number
-          anime_image?: string | null
-          anime_title?: string
-          average_rating?: number | null
-          common_negatives?: Json | null
-          common_positives?: Json | null
-          created_at?: string
-          last_calculated_at?: string | null
-          rating_1_2?: number | null
-          rating_3_4?: number | null
-          rating_5_6?: number | null
-          rating_7_8?: number | null
-          rating_9_10?: number | null
-          recommendation_percent?: number | null
-          top_tags?: Json | null
-          total_reviews?: number | null
-        }
-        Relationships: []
-      }
-      anime_reviews: {
-        Row: {
-          agree_count: number | null
-          anime_id: number
-          anime_image: string | null
-          anime_title: string
-          content: string
-          created_at: string
-          disagree_count: number | null
-          edit_count: number | null
-          hidden_reason: string | null
-          id: string
-          is_recommended: boolean | null
-          is_spoiler: boolean | null
-          last_edited_at: string | null
-          neutral_count: number | null
-          rating: number | null
-          report_count: number | null
-          status: Database["public"]["Enums"]["review_status"] | null
-          tags: string[] | null
-          updated_at: string
-          useful_count: number | null
-          user_id: string
-        }
-        Insert: {
-          agree_count?: number | null
-          anime_id: number
-          anime_image?: string | null
-          anime_title: string
-          content: string
-          created_at?: string
-          disagree_count?: number | null
-          edit_count?: number | null
-          hidden_reason?: string | null
-          id?: string
-          is_recommended?: boolean | null
-          is_spoiler?: boolean | null
-          last_edited_at?: string | null
-          neutral_count?: number | null
-          rating?: number | null
-          report_count?: number | null
-          status?: Database["public"]["Enums"]["review_status"] | null
-          tags?: string[] | null
-          updated_at?: string
-          useful_count?: number | null
-          user_id: string
-        }
-        Update: {
-          agree_count?: number | null
-          anime_id?: number
-          anime_image?: string | null
-          anime_title?: string
-          content?: string
-          created_at?: string
-          disagree_count?: number | null
-          edit_count?: number | null
-          hidden_reason?: string | null
-          id?: string
-          is_recommended?: boolean | null
-          is_spoiler?: boolean | null
-          last_edited_at?: string | null
-          neutral_count?: number | null
-          rating?: number | null
-          report_count?: number | null
-          status?: Database["public"]["Enums"]["review_status"] | null
-          tags?: string[] | null
-          updated_at?: string
-          useful_count?: number | null
-          user_id?: string
-        }
-        Relationships: []
-      }
-      friendships: {
-        Row: {
-          addressee_id: string
-          created_at: string
-          id: string
-          requester_id: string
-          status: string
-          updated_at: string
-        }
-        Insert: {
-          addressee_id: string
-          created_at?: string
-          id?: string
-          requester_id: string
-          status?: string
-          updated_at?: string
-        }
-        Update: {
-          addressee_id?: string
-          created_at?: string
-          id?: string
-          requester_id?: string
-          status?: string
-          updated_at?: string
-        }
-        Relationships: []
-      }
       profiles: {
         Row: {
           bio: string | null
@@ -582,15 +426,6 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      are_friends: {
-        Args: { _user1: string; _user2: string }
-        Returns: boolean
-      }
-      calculate_credibility_score: {
-        Args: { _user_id: string }
-        Returns: number
-      }
-      check_and_award_badges: { Args: { _user_id: string }; Returns: undefined }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -605,11 +440,7 @@ export type Database = {
     }
     Enums: {
       app_role: "user" | "moderator" | "admin"
-      ban_type: "none" | "shadow" | "full"
-      report_status: "pending" | "reviewed" | "dismissed" | "actioned"
-      review_reaction: "useful" | "agree" | "neutral" | "disagree"
-      review_status: "visible" | "hidden" | "deleted"
-      share_permission: "none" | "friends_only" | "public"
+      share_permission: "none" | "public"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -738,11 +569,7 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["user", "moderator", "admin"],
-      ban_type: ["none", "shadow", "full"],
-      report_status: ["pending", "reviewed", "dismissed", "actioned"],
-      review_reaction: ["useful", "agree", "neutral", "disagree"],
-      review_status: ["visible", "hidden", "deleted"],
-      share_permission: ["none", "friends_only", "public"],
+      share_permission: ["none", "public"],
     },
   },
 } as const

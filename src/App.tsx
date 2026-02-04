@@ -19,6 +19,7 @@ import SharedListPage from "./pages/SharedListPage";
 import SetupPage from "./pages/SetupPage";
 import NotFound from "./pages/NotFound";
 import { useRealtimeAnimeList } from "./hooks/useRealtimeAnimeList";
+import HowItWorksPage from "./pages/HowItWorksPage";
 
 const queryClient = new QueryClient();
 
@@ -117,6 +118,7 @@ function AppContent() {
           <Route path="/anime/:id" element={<AnimeDetailPage />} />
           <Route path="/stats" element={<StatsPage />} />
           <Route path="/profile" element={<ProfilePage />} />
+          <Route path="/how-it-works" element={<HowItWorksPage />} />
         </Route>
         <Route path="*" element={<NotFound />} />
       </Routes>

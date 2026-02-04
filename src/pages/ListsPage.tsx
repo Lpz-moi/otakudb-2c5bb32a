@@ -1,8 +1,9 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { List, Play, Check, Clock, Heart, Star } from 'lucide-react';
 import { useAnimeListStore, type ListStatus } from '@/stores/animeListStore';
 import { AnimeCard } from '@/components/anime/AnimeCard';
 import { Link } from 'react-router-dom';
+import { AnimeGridSkeleton } from '@/components/ui/skeleton-loader';
 
 const tabs: { status: ListStatus; label: string; icon: React.ElementType }[] = [
   { status: 'watching', label: 'En cours', icon: Play },
@@ -13,9 +14,17 @@ const tabs: { status: ListStatus; label: string; icon: React.ElementType }[] = [
 
 const ListsPage = () => {
   const [activeTab, setActiveTab] = useState<ListStatus>('watching');
+  const [isLoading, setIsLoading] = useState(true);
   const { getItemsByStatus, getStats } = useAnimeListStore();
   const stats = getStats();
   const items = getItemsByStatus(activeTab);
+
+  // Simulate loading for skeleton effect
+  useEffect(() => {
+    setIsLoading(true);
+    const timer = setTimeout(() => setIsLoading(false), 500);
+    return () => clearTimeout(timer);
+  }, [activeTab]);
 
   const renderRatingStars = (rating: number | null) => {
     if (!rating) return null;
@@ -81,7 +90,9 @@ const ListsPage = () => {
       </div>
 
       {/* List Content */}
-      {items.length === 0 ? (
+      {isLoading ? (
+        <AnimeGridSkeleton count={6} />
+      ) : items.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-12 text-center">
           <div className="w-14 h-14 rounded-2xl bg-secondary flex items-center justify-center mb-3">
             {activeTab === 'watching' && <Play className="w-6 h-6 text-muted-foreground" />}

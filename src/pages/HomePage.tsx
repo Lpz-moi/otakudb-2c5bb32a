@@ -15,6 +15,7 @@ import { Link } from 'react-router-dom';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { AnimeGridSkeleton } from '@/components/ui/skeleton-loader';
 
 type TabValue = 'watching' | 'completed' | 'planned' | 'favorites';
 
@@ -144,6 +145,9 @@ const HomePage = () => {
                 <h2 className="font-display font-bold text-foreground text-base">Bienvenue sur OtakuDB</h2>
                 <p className="text-sm text-muted-foreground mt-1 leading-relaxed">
                   Suivez vos animes préférés, recevez des rappels et ne manquez plus jamais un épisode.
+                  <Link to="/how-it-works" className="text-primary hover:underline ml-1">
+                    Comment ça marche ?
+                  </Link>
                 </p>
               </div>
             </div>
@@ -306,17 +310,7 @@ const HomePage = () => {
           </h2>
           
           {loading ? (
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3">
-              {Array.from({ length: 12 }).map((_, i) => (
-                <div key={i} className="animate-pulse">
-                  <div className="aspect-[3/4] bg-muted/50 rounded-xl" />
-                  <div className="p-2.5 space-y-2">
-                    <div className="h-3 bg-muted/50 rounded w-3/4" />
-                    <div className="h-2 bg-muted/30 rounded w-1/2" />
-                  </div>
-                </div>
-              ))}
-            </div>
+            <AnimeGridSkeleton count={12} />
           ) : (
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3">
               {trendingAnime.map((anime, index) => (

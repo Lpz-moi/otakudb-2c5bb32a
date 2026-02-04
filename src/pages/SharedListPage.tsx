@@ -170,7 +170,7 @@ const SharedListPage = () => {
                 <User className="w-6 h-6 text-white" />
               </div>
               <div>
-                <p className="text-xs text-muted-foreground">Liste partagée par</p>
+                <p className="text-xs text-muted-foreground">Liste de</p>
                 <p className="text-lg font-bold text-foreground">
                   {owner.display_name || owner.discord_username || 'Utilisateur'}
                 </p>
