@@ -1,1 +1,10 @@
 project_id = "lgnspsqlifylokwowqzq"
+
+[functions.discord-auth]
+verify_jwt = false
+
+[functions.reviews]
+verify_jwt = false
+
+[functions.admin-reviews]
+verify_jwt = false

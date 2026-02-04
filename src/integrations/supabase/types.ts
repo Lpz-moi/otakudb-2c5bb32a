@@ -92,6 +92,135 @@ export type Database = {
         }
         Relationships: []
       }
+      anime_review_summary: {
+        Row: {
+          anime_id: number
+          anime_image: string | null
+          anime_title: string
+          average_rating: number | null
+          common_negatives: Json | null
+          common_positives: Json | null
+          created_at: string
+          last_calculated_at: string | null
+          rating_1_2: number | null
+          rating_3_4: number | null
+          rating_5_6: number | null
+          rating_7_8: number | null
+          rating_9_10: number | null
+          recommendation_percent: number | null
+          top_tags: Json | null
+          total_reviews: number | null
+        }
+        Insert: {
+          anime_id: number
+          anime_image?: string | null
+          anime_title: string
+          average_rating?: number | null
+          common_negatives?: Json | null
+          common_positives?: Json | null
+          created_at?: string
+          last_calculated_at?: string | null
+          rating_1_2?: number | null
+          rating_3_4?: number | null
+          rating_5_6?: number | null
+          rating_7_8?: number | null
+          rating_9_10?: number | null
+          recommendation_percent?: number | null
+          top_tags?: Json | null
+          total_reviews?: number | null
+        }
+        Update: {
+          anime_id?: number
+          anime_image?: string | null
+          anime_title?: string
+          average_rating?: number | null
+          common_negatives?: Json | null
+          common_positives?: Json | null
+          created_at?: string
+          last_calculated_at?: string | null
+          rating_1_2?: number | null
+          rating_3_4?: number | null
+          rating_5_6?: number | null
+          rating_7_8?: number | null
+          rating_9_10?: number | null
+          recommendation_percent?: number | null
+          top_tags?: Json | null
+          total_reviews?: number | null
+        }
+        Relationships: []
+      }
+      anime_reviews: {
+        Row: {
+          agree_count: number | null
+          anime_id: number
+          anime_image: string | null
+          anime_title: string
+          content: string
+          created_at: string
+          disagree_count: number | null
+          edit_count: number | null
+          hidden_reason: string | null
+          id: string
+          is_recommended: boolean | null
+          is_spoiler: boolean | null
+          last_edited_at: string | null
+          neutral_count: number | null
+          rating: number | null
+          report_count: number | null
+          status: Database["public"]["Enums"]["review_status"] | null
+          tags: string[] | null
+          updated_at: string
+          useful_count: number | null
+          user_id: string
+        }
+        Insert: {
+          agree_count?: number | null
+          anime_id: number
+          anime_image?: string | null
+          anime_title: string
+          content: string
+          created_at?: string
+          disagree_count?: number | null
+          edit_count?: number | null
+          hidden_reason?: string | null
+          id?: string
+          is_recommended?: boolean | null
+          is_spoiler?: boolean | null
+          last_edited_at?: string | null
+          neutral_count?: number | null
+          rating?: number | null
+          report_count?: number | null
+          status?: Database["public"]["Enums"]["review_status"] | null
+          tags?: string[] | null
+          updated_at?: string
+          useful_count?: number | null
+          user_id: string
+        }
+        Update: {
+          agree_count?: number | null
+          anime_id?: number
+          anime_image?: string | null
+          anime_title?: string
+          content?: string
+          created_at?: string
+          disagree_count?: number | null
+          edit_count?: number | null
+          hidden_reason?: string | null
+          id?: string
+          is_recommended?: boolean | null
+          is_spoiler?: boolean | null
+          last_edited_at?: string | null
+          neutral_count?: number | null
+          rating?: number | null
+          report_count?: number | null
+          status?: Database["public"]["Enums"]["review_status"] | null
+          tags?: string[] | null
+          updated_at?: string
+          useful_count?: number | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       friendships: {
         Row: {
           addressee_id: string
@@ -192,6 +321,109 @@ export type Database = {
         }
         Relationships: []
       }
+      review_config: {
+        Row: {
+          description: string | null
+          key: string
+          updated_at: string | null
+          value: Json
+        }
+        Insert: {
+          description?: string | null
+          key: string
+          updated_at?: string | null
+          value: Json
+        }
+        Update: {
+          description?: string | null
+          key?: string
+          updated_at?: string | null
+          value?: Json
+        }
+        Relationships: []
+      }
+      review_reactions: {
+        Row: {
+          created_at: string
+          id: string
+          reaction: Database["public"]["Enums"]["review_reaction"]
+          review_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          reaction: Database["public"]["Enums"]["review_reaction"]
+          review_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          reaction?: Database["public"]["Enums"]["review_reaction"]
+          review_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "review_reactions_review_id_fkey"
+            columns: ["review_id"]
+            isOneToOne: false
+            referencedRelation: "anime_reviews"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      review_reports: {
+        Row: {
+          created_at: string
+          details: string | null
+          id: string
+          moderator_id: string | null
+          moderator_notes: string | null
+          reason: string
+          reporter_id: string
+          resolved_at: string | null
+          review_id: string
+          status: Database["public"]["Enums"]["report_status"] | null
+        }
+        Insert: {
+          created_at?: string
+          details?: string | null
+          id?: string
+          moderator_id?: string | null
+          moderator_notes?: string | null
+          reason: string
+          reporter_id: string
+          resolved_at?: string | null
+          review_id: string
+          status?: Database["public"]["Enums"]["report_status"] | null
+        }
+        Update: {
+          created_at?: string
+          details?: string | null
+          id?: string
+          moderator_id?: string | null
+          moderator_notes?: string | null
+          reason?: string
+          reporter_id?: string
+          resolved_at?: string | null
+          review_id?: string
+          status?: Database["public"]["Enums"]["report_status"] | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "review_reports_review_id_fkey"
+            columns: ["review_id"]
+            isOneToOne: false
+            referencedRelation: "anime_reviews"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       session_logs: {
         Row: {
           action: string
@@ -252,6 +484,78 @@ export type Database = {
         }
         Relationships: []
       }
+      user_badges: {
+        Row: {
+          badge_description: string | null
+          badge_icon: string | null
+          badge_name: string
+          badge_type: string
+          earned_at: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          badge_description?: string | null
+          badge_icon?: string | null
+          badge_name: string
+          badge_type: string
+          earned_at?: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          badge_description?: string | null
+          badge_icon?: string | null
+          badge_name?: string
+          badge_type?: string
+          earned_at?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_moderation: {
+        Row: {
+          ban_expires_at: string | null
+          ban_reason: string | null
+          ban_status: Database["public"]["Enums"]["ban_type"] | null
+          created_at: string
+          credibility_score: number | null
+          id: string
+          review_cooldown_until: string | null
+          total_helpful_votes: number | null
+          total_reviews: number | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          ban_expires_at?: string | null
+          ban_reason?: string | null
+          ban_status?: Database["public"]["Enums"]["ban_type"] | null
+          created_at?: string
+          credibility_score?: number | null
+          id?: string
+          review_cooldown_until?: string | null
+          total_helpful_votes?: number | null
+          total_reviews?: number | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          ban_expires_at?: string | null
+          ban_reason?: string | null
+          ban_status?: Database["public"]["Enums"]["ban_type"] | null
+          created_at?: string
+          credibility_score?: number | null
+          id?: string
+          review_cooldown_until?: string | null
+          total_helpful_votes?: number | null
+          total_reviews?: number | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string
@@ -282,6 +586,11 @@ export type Database = {
         Args: { _user1: string; _user2: string }
         Returns: boolean
       }
+      calculate_credibility_score: {
+        Args: { _user_id: string }
+        Returns: number
+      }
+      check_and_award_badges: { Args: { _user_id: string }; Returns: undefined }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -289,9 +598,17 @@ export type Database = {
         }
         Returns: boolean
       }
+      recalculate_anime_summary: {
+        Args: { _anime_id: number }
+        Returns: undefined
+      }
     }
     Enums: {
       app_role: "user" | "moderator" | "admin"
+      ban_type: "none" | "shadow" | "full"
+      report_status: "pending" | "reviewed" | "dismissed" | "actioned"
+      review_reaction: "useful" | "agree" | "neutral" | "disagree"
+      review_status: "visible" | "hidden" | "deleted"
       share_permission: "none" | "friends_only" | "public"
     }
     CompositeTypes: {
@@ -421,6 +738,10 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["user", "moderator", "admin"],
+      ban_type: ["none", "shadow", "full"],
+      report_status: ["pending", "reviewed", "dismissed", "actioned"],
+      review_reaction: ["useful", "agree", "neutral", "disagree"],
+      review_status: ["visible", "hidden", "deleted"],
       share_permission: ["none", "friends_only", "public"],
     },
   },
