@@ -62,11 +62,6 @@ const AuthPage = () => {
       description: 'Chiffrement AES-256 et sync cloud',
     },
     {
-      icon: Users,
-      title: 'Partage social',
-      description: 'Partagez vos listes avec vos amis Discord',
-    },
-    {
       icon: Sparkles,
       title: 'Sync automatique',
       description: 'Vos données suivent votre compte',
@@ -111,7 +106,7 @@ const AuthPage = () => {
               <span className="text-primary">intelligemment</span>
             </h1>
             <p className="text-sm text-muted-foreground leading-relaxed">
-              Suivez votre progression, partagez vos listes et découvrez de nouveaux animes avec vos amis.
+              Suivez votre progression et découvrez de nouveaux animes.
             </p>
           </div>
 

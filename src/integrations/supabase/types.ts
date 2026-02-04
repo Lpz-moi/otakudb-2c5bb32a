@@ -92,33 +92,6 @@ export type Database = {
         }
         Relationships: []
       }
-      friendships: {
-        Row: {
-          addressee_id: string
-          created_at: string
-          id: string
-          requester_id: string
-          status: string
-          updated_at: string
-        }
-        Insert: {
-          addressee_id: string
-          created_at?: string
-          id?: string
-          requester_id: string
-          status?: string
-          updated_at?: string
-        }
-        Update: {
-          addressee_id?: string
-          created_at?: string
-          id?: string
-          requester_id?: string
-          status?: string
-          updated_at?: string
-        }
-        Relationships: []
-      }
       profiles: {
         Row: {
           bio: string | null
@@ -278,10 +251,6 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      are_friends: {
-        Args: { _user1: string; _user2: string }
-        Returns: boolean
-      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -292,7 +261,7 @@ export type Database = {
     }
     Enums: {
       app_role: "user" | "moderator" | "admin"
-      share_permission: "none" | "friends_only" | "public"
+      share_permission: "none" | "public"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -421,7 +390,7 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["user", "moderator", "admin"],
-      share_permission: ["none", "friends_only", "public"],
+      share_permission: ["none", "public"],
     },
   },
 } as const

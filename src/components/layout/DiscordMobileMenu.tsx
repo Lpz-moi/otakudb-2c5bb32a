@@ -11,7 +11,8 @@ import {
   User, 
   LogOut,
   Share2,
-  Tv
+  Tv,
+  HelpCircle
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { cn } from '@/lib/utils';
@@ -26,10 +27,10 @@ const mainNavItems = [
   { path: '/discover', icon: Compass, label: 'Découvrir' },
   { path: '/search', icon: Search, label: 'Rechercher' },
   { path: '/lists', icon: List, label: 'Mes Listes' },
+  { path: '/how-it-works', icon: HelpCircle, label: 'Comment ça marche' },
 ];
 
 const socialNavItems = [
-  { path: '/friends', icon: Users, label: 'Amis' },
   { path: '/stats', icon: BarChart3, label: 'Statistiques' },
   { path: '/share', icon: Share2, label: 'Partager' },
 ];

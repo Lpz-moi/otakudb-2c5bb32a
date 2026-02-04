@@ -14,19 +14,19 @@ const SharePage = () => {
   const { user, profile, refreshProfile } = useAuth();
   const { getStats } = useAnimeListStore();
   const [sharePermissions, setSharePermissions] = useState({
-    watching: profile?.share_watching || 'friends_only',
-    completed: profile?.share_completed || 'friends_only',
-    planned: profile?.share_planned || 'none',
-    favorites: profile?.share_favorites || 'friends_only',
+    watching: profile?.share_watching === 'public' ? 'public' : 'none',
+    completed: profile?.share_completed === 'public' ? 'public' : 'none',
+    planned: profile?.share_planned === 'public' ? 'public' : 'none',
+    favorites: profile?.share_favorites === 'public' ? 'public' : 'none',
   });
 
   useEffect(() => {
     if (profile) {
       setSharePermissions({
-        watching: profile.share_watching || 'friends_only',
-        completed: profile.share_completed || 'friends_only',
-        planned: profile.share_planned || 'none',
-        favorites: profile.share_favorites || 'friends_only',
+        watching: profile.share_watching === 'public' ? 'public' : 'none',
+        completed: profile.share_completed === 'public' ? 'public' : 'none',
+        planned: profile.share_planned === 'public' ? 'public' : 'none',
+        favorites: profile.share_favorites === 'public' ? 'public' : 'none',
       });
     }
   }, [profile]);
@@ -108,7 +108,7 @@ const SharePage = () => {
           <h1 className="text-2xl font-bold text-foreground">Partager</h1>
         </div>
         <p className="text-muted-foreground text-sm">
-          Partagez vos listes d'anime avec vos amis en un clic
+          Partagez vos listes d'anime en un clic
         </p>
       </motion.div>
 
@@ -132,7 +132,7 @@ const SharePage = () => {
               itemCount={stats[status]}
               isPublic={sharePermissions[status] !== 'none'}
               onTogglePublic={() => {
-                const newPerm = sharePermissions[status] === 'none' ? 'friends_only' : 'none';
+                const newPerm = sharePermissions[status] === 'none' ? 'public' : 'none';
                 updatePermission(status, newPerm as SharePermission);
               }}
               shareUrl={getShareUrl(status)}
@@ -145,7 +145,7 @@ const SharePage = () => {
       {/* Info Card */}
       <div className="glass-card p-4 border border-blue-500/20 bg-gradient-to-br from-blue-500/10 to-transparent">
         <p className="text-xs text-blue-200">
-          💡 <span className="font-semibold">Conseil :</span> Rendez votre liste "Public" pour qu'elle soit visible à tous, ou "Amis" pour la partager uniquement avec votre réseau Discord.
+          💡 <span className="font-semibold">Conseil :</span> Rendez votre liste "Public" pour qu'elle soit visible à tous via le lien de partage.
         </p>
       </div>
     </div>
